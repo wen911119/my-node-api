@@ -26,11 +26,11 @@ const JiaoBenUsersDevicesSchema = new mongoose.Schema({
   },
   gameCode: {
     type: String,
-    match: [/^G[0-9]+/, '{PATH} ({VALUE}) 不是合法的游戏编号。']    
+    match: [/^G[0-9]+/, '{PATH} ({VALUE}) 不是合法的游戏编号。']
   },
   distributorId: {
     type: String,
-    match: [/^J[0-9]+/, '{PATH} ({VALUE}) 不是合法的脚本作者编号。']    
+    match: [/^J[0-9]+/, '{PATH} ({VALUE}) 不是合法的脚本作者编号。']
   },
   fkey: {
     type: String
