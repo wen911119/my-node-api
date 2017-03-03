@@ -6,11 +6,11 @@ import deviceCtrl from '../controllers/device.controller';
 const router = express.Router(); // eslint-disable-line new-cap
 
 router.route('/')
-  /** GET /api/users - Get list of users */
-//   .get(userCtrl.list)
+    /** GET /api/users - Get list of users */
+    //   .get(userCtrl.list)
 
-  /** POST /api/users - Create new user */
-  .post(deviceCtrl.create);
+    /** POST /api/users - Create new user */
+    .post(deviceCtrl.create);
 
 // router.route('/:userId')
 //   /** GET /api/users/:userId - Get user */

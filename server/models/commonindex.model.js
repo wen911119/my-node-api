@@ -1,7 +1,7 @@
-import Promise from 'bluebird';
+// import Promise from 'bluebird';
 import mongoose from 'mongoose';
-import httpStatus from 'http-status';
-import APIError from '../helpers/APIError';
+// import httpStatus from 'http-status';
+// import APIError from '../helpers/APIError';
 
 /**
  * User Schema
@@ -10,8 +10,8 @@ const commonIndexSchema = new mongoose.Schema({
   index: {
     type: Number
   },
-  name:{
-    type:String
+  name: {
+    type: String
   },
   lastUpdate: {
     type: Date,
@@ -36,7 +36,7 @@ commonIndexSchema.method({
  * Statics
  */
 commonIndexSchema.statics = {
-  
+
 };
 
 /**
