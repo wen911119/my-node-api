@@ -7,15 +7,31 @@ import APIError from '../helpers/APIError';
  * User Schema
  */
 const UserSchema = new mongoose.Schema({
-  username: {
+  // 用户openid
+  openId: {
     type: String,
     required: true
   },
-  mobileNumber: {
-    type: String,
-    required: true,
-    match: [/^[1-9][0-9]{10}$/, 'The value of path {PATH} ({VALUE}) is not a valid mobile number.']
+  // 用户点卡
+  coins: {
+    type: Number,
+    default: 0
   },
+  // 用户购买的应用
+  app: {
+    type: Array,
+    default: []
+  },
+  // 用户授权的设备 
+  devices: {
+    type: Array,
+    default: []
+  },
+  // 用户上次登录时间
+  lastLogin: {
+    type: Date
+  },
+  // 用户创建时间
   createdAt: {
     type: Date,
     default: Date.now
@@ -54,6 +70,11 @@ UserSchema.statics = {
         const err = new APIError('No such user exists!', httpStatus.NOT_FOUND);
         return Promise.reject(err);
       });
+  },
+
+  /**新增或者更新user */
+  createOrUpdate(openid, deviceid) {
+    return this.update({ openId: openid }, { $push: { devices: { deviceId: deviceid } } }, { upsert: true }).exec();
   },
 
   /**
