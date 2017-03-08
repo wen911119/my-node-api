@@ -26,5 +26,24 @@ export default {
       username: Joi.string().required(),
       password: Joi.string().required()
     }
+  },
+
+  deviceloginWithoutOpenId:{
+    body:{
+      deviceid:Joi.string().regex(/^D[0-9]+$/).required(),
+      appid:string().regex(/^G[0-9]+$/).required(),
+      developerid:string().hex().required()
+    }
+  },
+
+  deviceloginWithOpenId:{
+    body:{
+      deviceid:Joi.string().regex(/^D[0-9]+$/).required(),
+      appid:string().regex(/^G[0-9]+$/).required(),
+      developerid:string().hex().required()
+    },
+    params: {
+      openid:Joi.string().hex().required()
+    }
   }
 };

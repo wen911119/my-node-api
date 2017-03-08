@@ -47,4 +47,8 @@ function getRandomNumber(req, res) {
   });
 }
 
+function deviceloginWithoutOpenId(req, res, next){
+
+}
+
 export default { login, getRandomNumber };

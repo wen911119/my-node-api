@@ -5,7 +5,7 @@ import deviceCtrl from '../controllers/device.controller';
 
 const router = express.Router(); // eslint-disable-line new-cap
 
-router.route('/')
+router.route('/new')
     /** GET /api/users - Get list of users */
     //   .get(userCtrl.list)
 
