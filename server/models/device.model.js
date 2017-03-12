@@ -15,6 +15,10 @@ const JiaoBenUsersDevicesSchema = new mongoose.Schema({
     required: true,
     match: [/^D[0-9]+/, '{PATH} ({VALUE}) 不是合法的设备编号。']
   },
+  qrcodeUrl:{
+    type:String,
+    required:true
+  },
   deviceType: {
     type: String
   },
@@ -66,6 +70,9 @@ JiaoBenUsersDevicesSchema.method({
 JiaoBenUsersDevicesSchema.statics = {
   create(){
     return this.find()
+  },
+  binding({deviceid, openid}){
+    return this.save({deviceId:deviceid, openId:openid})
   }
 };
 

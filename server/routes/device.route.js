@@ -12,6 +12,9 @@ router.route('/new')
     /** POST /api/users - Create new user */
     .post(deviceCtrl.create);
 
+router.route('/binding')
+    .post(paramValidation.bindingOpenId, deviceCtrl.bindingOpenId);
+
 // router.route('/:userId')
 //   /** GET /api/users/:userId - Get user */
 //   .get(userCtrl.get)

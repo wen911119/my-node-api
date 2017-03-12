@@ -89,7 +89,9 @@ UserSchema.statics = {
       .skip(skip)
       .limit(limit)
       .exec();
-  }
+  },
+
+  
 };
 
 /**

@@ -2,6 +2,9 @@ import jwt from 'jsonwebtoken';
 import httpStatus from 'http-status';
 import APIError from '../helpers/APIError';
 import config from '../../config/config';
+import User from '../models/user.model';
+import Device from '../models/device.model'
+
 
 // sample user, used for authentication
 const user = {
@@ -48,6 +51,10 @@ function getRandomNumber(req, res) {
 }
 
 function deviceloginWithoutOpenId(req, res, next){
+  const {deviceid, appid, developid} = req.body;
+  Device.find({deviceId:deviceid}).then(function(data){
+    User.createOrUpdate(data.openId, appid, deviceid, developid);
+  });
 
 }
 

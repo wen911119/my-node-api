@@ -45,5 +45,12 @@ export default {
     params: {
       openid:Joi.string().hex().required()
     }
+  },
+
+  bindingOpenId:{
+    body:{
+      deviceid:Joi.string().regex(/^D[0-9]+$/).required(),
+      openid:Joi.string().hex().required()
+    }
   }
 };
