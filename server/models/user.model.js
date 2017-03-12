@@ -18,7 +18,7 @@ const UserSchema = new mongoose.Schema({
     default: 0
   },
   // 用户购买的应用
-  app: {
+  apps: {
     type: Array,
     default: []
   },
@@ -73,7 +73,7 @@ UserSchema.statics = {
   },
 
   /**新增或者更新user */
-  createOrUpdate(openid, deviceid) {
+  createOrUpdate(openid, appid, deviceid, developid) {
     return this.update({ openId: openid }, { $push: { devices: { deviceId: deviceid } } }, { upsert: true }).exec();
   },
 
@@ -91,7 +91,7 @@ UserSchema.statics = {
       .exec();
   },
 
-  
+
 };
 
 /**
