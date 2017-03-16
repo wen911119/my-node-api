@@ -99,7 +99,7 @@ UserSchema.statics = {
         // 还要判断应用存不存在
         if(user.apps.some(item=>item.appId == data.appId)){
           // 应用已经存在了，只要更新下该应用的devicesNum
-          self.update({openId:data.openId},{})
+          self.update({openId:data.openId,apps:{$elemMatch:{appId:data.appId}}},{$inc:{"apps.$.devicesNum":1}})
 
         }else{
           // 应用不存在
