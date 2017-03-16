@@ -5,15 +5,15 @@ import deviceCtrl from '../controllers/device.controller';
 
 const router = express.Router(); // eslint-disable-line new-cap
 
-router.route('/new')
+router.route('/register')
     /** GET /api/users - Get list of users */
     //   .get(userCtrl.list)
 
     /** POST /api/users - Create new user */
-    .post(deviceCtrl.create);
+    .post(paramValidation.registerDevice,deviceCtrl.register);
 
-router.route('/binding')
-    .post(paramValidation.bindingOpenId, deviceCtrl.bindingOpenId);
+router.route('/bind')
+    .post(paramValidation.bindDevice, deviceCtrl.bind);
 
 // router.route('/:userId')
 //   /** GET /api/users/:userId - Get user */

@@ -6,14 +6,16 @@ import APIError from '../helpers/APIError';
 /**
  * User Schema
  */
-const JiaoBenUsersDevicesSchema = new mongoose.Schema({
-  deviceId: {
+const StrategySchema = new mongoose.Schema({
+  appId: {
     type: String,
     required: true,
     match: [/^D[0-9]+/, '{PATH} ({VALUE}) 不是合法的设备编号。']
   },
-  openId: {
-    type: String
+  developerId: {
+    type: String,
+    required: true,
+    match: [/^D[0-9]+/, '{PATH} ({VALUE}) 不是合法的设备编号。']
   },
   qrcodeUrl:{
     type:String,

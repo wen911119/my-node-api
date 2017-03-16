@@ -91,6 +91,21 @@ UserSchema.statics = {
       .exec();
   },
 
+  addApp(data){
+    let self = this;
+    return self.find({openId:data.openId}).exec().then(function(user){
+      if(user){
+        // 用户存在
+      }else{
+        // 用户不存在
+        // 要创建一个用户
+        // 但同时也给用户添加了一个app,这个app的总送点卡数需要先查出来
+        
+        return self.save({openId:data.openId, apps:[{}]}).exec()
+      }
+    });
+  }
+
 
 };
 

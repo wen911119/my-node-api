@@ -36,7 +36,7 @@ commonIndexSchema.method({
  * Statics
  */
 commonIndexSchema.statics = {
-  getIndexAndRefresh:function(name){
+  getNewIndex:function(name){
     return this.findOneAndUpdate({name:name},{$inc:{index:1}}).exec();
   }
 };
