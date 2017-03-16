@@ -1,6 +1,8 @@
 import Device from '../models/device.model'
 import CommonIndex from '../models/commonindex.model';
 import User from '../models/user.model';
+import Strategy from '../models/strategy.model';
+
 
 
 /**新建一个设备记录 */
@@ -23,21 +25,15 @@ function register(req, res, next) {
 
 function bind(req, res, next){
     //const {openid, deviceid, appid, developerid} = req.body;
-    Device.bind(req.body).then(function(data){
-        if(data){
-            // 要去用户表查看这个用户是不是存在
-            User.addApp(data).exec().then(function(user){
-                if(user){
-                    // 用户存在
-                    if(user.app){
-
-                    }
+    Device.bind(req.body).then(function(device){
+        if(device){
+            // 要去查游戏优惠策略和扣费方式
+            Strategy.get(device).then(function(strategy){
+                User.addApp(device, strategy).then(function(user){
                     
-                }else{
-                    // 用户不存在
-
-                }
+                });
             });
+            
         }else{
             res.send('设备不存在');
         }

@@ -17,35 +17,12 @@ const StrategySchema = new mongoose.Schema({
     required: true,
     match: [/^D[0-9]+/, '{PATH} ({VALUE}) 不是合法的设备编号。']
   },
-  qrcodeUrl:{
-    type:String,
+  giftCoins:{
+    type:Number,
     required:true
   },
-  deviceType: {
-    type: String
-  },
-  deviceModel: {
-    type: String
-  },
-  devicePixels: {
-    type: String
-  },
-  appId: {
-    type: String,
-    match: [/^G[0-9]+/, '{PATH} ({VALUE}) 不是合法的游戏编号。']
-  },
-  developerId: {
-    type: String,
-    match: [/^J[0-9]+/, '{PATH} ({VALUE}) 不是合法的脚本作者编号。']
-  },
-  fkey: {
-    type: String
-  },
-  lastLoginTime: {
-    type: Date
-  },
-  lastLoginPosition: {
-    type: String
+  consumeType: {
+    type: Number
   },
   createdAt: {
     type: Date,
@@ -63,23 +40,21 @@ const StrategySchema = new mongoose.Schema({
 /**
  * Methods
  */
-JiaoBenUsersDevicesSchema.method({
+StrategySchema.method({
 });
 
 /**
  * Statics
  */
-JiaoBenUsersDevicesSchema.statics = {
-  create(){
-    return this.find()
-  },
-  bind({openid, deviceid, appid, developerid}){
+StrategySchema.statics = {
+  
+  get({appid, developerid}){
     // this.save({deviceId:deviceid, openId:openid})
-    return this.findOneAndUpdate({deviceId:deviceid, openId:''},{openId:openid,appid:appId,developerId:developerid}).exec();
-  },
+    return this.find({appId:appid, developerId:developerid}).exec();
+  }
 };
 
 /**
  * @typedef Device
  */
-export default mongoose.model('Device', JiaoBenUsersDevicesSchema);
+export default mongoose.model('Strategy', StrategySchema);

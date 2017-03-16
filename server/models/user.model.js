@@ -91,17 +91,25 @@ UserSchema.statics = {
       .exec();
   },
 
-  addApp(data){
+  addApp(data, strategy){
     let self = this;
     return self.find({openId:data.openId}).exec().then(function(user){
       if(user){
         // 用户存在
+        // 还要判断应用存不存在
+        if(user.apps.some(item=>item.appId == data.appId)){
+          // 应用已经存在了，只要更新下该应用的devicesNum
+          self.update({openId:data.openId},{})
+
+        }else{
+          // 应用不存在
+          self.update({openId:data.openId},{$addToSet:{apps:{appId:data.appId,coins:strategy.giftCoins,devicesNum:1}}})
+        }
       }else{
         // 用户不存在
         // 要创建一个用户
         // 但同时也给用户添加了一个app,这个app的总送点卡数需要先查出来
-        
-        return self.save({openId:data.openId, apps:[{}]}).exec()
+        return self.save({openId:data.openId, apps:[{appId:data.appId,coins:strategy.giftCoins,devicesNum:1}]}).exec()
       }
     });
   }
