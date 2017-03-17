@@ -37,7 +37,8 @@ const JiaoBenUsersDevicesSchema = new mongoose.Schema({
     match: [/^J[0-9]+/, '{PATH} ({VALUE}) 不是合法的脚本作者编号。']
   },
   fkey: {
-    type: String
+    type: String,
+    required:true
   },
   lastLoginTime: {
     type: Date
@@ -75,6 +76,15 @@ JiaoBenUsersDevicesSchema.statics = {
     // this.save({deviceId:deviceid, openId:openid})
     return this.findOneAndUpdate({deviceId:deviceid, openId:''},{openId:openid,appid:appId,developerId:developerid}).exec();
   },
+  checkoutDevice({deviceid, appid, developid, mid}){
+    return this.find({devideId:deviceid}).exec().then(function(deveice){
+      if(device.fkey+device.deviceId == mid){
+        return device
+      }
+      const err = new APIError('非法授权！', httpStatus.NOT_FOUND);
+      Promise.reject(err);
+    });
+  }
 };
 
 /**

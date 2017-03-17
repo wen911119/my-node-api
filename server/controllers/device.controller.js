@@ -14,7 +14,8 @@ function register(req, res, next) {
         const qrcode_url = '从微信拿回的带参临时二维码'
         const new_device = new Device({
             deviceId: 'D' + data.index,
-            qrcodeUrl:qrcode_url
+            qrcodeUrl:qrcode_url,
+            fkey:'123456'
         });
         //res.json({deviceId: 'D' + data.index, qrcodeUrl:''})
         new_device.save()
@@ -29,10 +30,11 @@ function bind(req, res, next){
         if(device){
             // 要去查游戏优惠策略和扣费方式
             Strategy.get(device).then(function(strategy){
+                // 更具策略给给用户添加应用
                 User.addApp(device, strategy).then(function(user){
-                    
-                });
-            });
+                    res.json(user)
+                }).catch(e=>next(e));
+            }).catch(e=>next(e));
             
         }else{
             res.send('设备不存在');

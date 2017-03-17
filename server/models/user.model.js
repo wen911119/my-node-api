@@ -99,11 +99,11 @@ UserSchema.statics = {
         // 还要判断应用存不存在
         if(user.apps.some(item=>item.appId == data.appId)){
           // 应用已经存在了，只要更新下该应用的devicesNum
-          self.update({openId:data.openId,apps:{$elemMatch:{appId:data.appId}}},{$inc:{"apps.$.devicesNum":1}})
+          return self.update({openId:data.openId,apps:{$elemMatch:{appId:data.appId}}},{$inc:{"apps.$.devicesNum":1}}).exec()
 
         }else{
           // 应用不存在
-          self.update({openId:data.openId},{$addToSet:{apps:{appId:data.appId,coins:strategy.giftCoins,devicesNum:1}}})
+          return self.update({openId:data.openId},{$addToSet:{apps:{appId:data.appId,coins:strategy.giftCoins,devicesNum:1}}}).exec()
         }
       }else{
         // 用户不存在

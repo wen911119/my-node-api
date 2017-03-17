@@ -51,10 +51,10 @@ function getRandomNumber(req, res) {
 }
 
 function deviceloginWithoutOpenId(req, res, next){
-  const {deviceid, appid, developid} = req.body;
-  Device.find({deviceId:deviceid}).then(function(data){
+  const {deviceid, appid, developid, mid} = req.body;
+  Device.checkoutDevice(req.body).then(function(device){
     User.createOrUpdate(data.openId, appid, deviceid, developid);
-  });
+  }).catch(e=>next(e));
 
 }
 
