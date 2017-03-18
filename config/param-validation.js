@@ -31,16 +31,16 @@ export default {
   deviceloginWithoutOpenId:{
     body:{
       deviceid:Joi.string().regex(/^D[0-9]+$/).required(),
-      appid:string().regex(/^G[0-9]+$/).required(),
-      developerid:string().hex().required()
+      appid:Joi.string().regex(/^G[0-9]+$/).required(),
+      developerid:Joi.string().hex().required()
     }
   },
 
   deviceloginWithOpenId:{
     body:{
       deviceid:Joi.string().regex(/^D[0-9]+$/).required(),
-      appid:string().regex(/^G[0-9]+$/).required(),
-      developerid:string().hex().required()
+      appid:Joi.string().regex(/^G[0-9]+$/).required(),
+      developerid:Joi.string().hex().required()
     },
     params: {
       openid:Joi.string().hex().required()
@@ -51,15 +51,15 @@ export default {
     body:{
       deviceid:Joi.string().regex(/^D[0-9]+$/).required(),
       openid:Joi.string().hex().required(),
-      appid:string().regex(/^G[0-9]+$/).required(),
-      developerid:string().hex().required()
+      appid:Joi.string().regex(/^G[0-9]+$/).required(),
+      developerid:Joi.string().hex().required()
     }
   },
   // 注册一台新设备
   registerDevice:{
     body:{
-      appid:string().regex(/^G[0-9]+$/).required(),
-      developerid:string().hex().required()
+      appid:Joi.string().hex().required(),
+      developerid:Joi.string().hex().required()
     }
   }
 };

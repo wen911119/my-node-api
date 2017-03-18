@@ -10,10 +10,10 @@ router.route('/register')
     //   .get(userCtrl.list)
 
     /** POST /api/users - Create new user */
-    .post(paramValidation.registerDevice,deviceCtrl.register);
+    .post(validate(paramValidation.registerDevice), deviceCtrl.register);
 
 router.route('/bind')
-    .post(paramValidation.bindDevice, deviceCtrl.bind);
+    .post(validate(paramValidation.bindDevice), deviceCtrl.bind);
 
 // router.route('/:userId')
 //   /** GET /api/users/:userId - Get user */

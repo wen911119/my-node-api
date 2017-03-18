@@ -3,43 +3,55 @@ import CommonIndex from '../models/commonindex.model';
 import User from '../models/user.model';
 import Strategy from '../models/strategy.model';
 
-
-
+var fetch = require('node-fetch');
+let device_index = 0;
 /**新建一个设备记录 */
 function register(req, res, next) {
-    CommonIndex.getNewIndex({ name: 'device' }).then(function (data) {
-        const {appid, developerid} = req.body;
-        const qr_param = parseInt(data.index+'a'+appid+'a'+developerid, 16);
-        //todo 去微信拿到临时代带参二维码 
-        const qrcode_url = '从微信拿回的带参临时二维码'
-        const new_device = new Device({
-            deviceId: 'D' + data.index,
-            qrcodeUrl:qrcode_url,
-            fkey:'123456'
-        });
-        //res.json({deviceId: 'D' + data.index, qrcodeUrl:''})
-        new_device.save()
-            .then(saveDevice => res.json(saveDevice))
-            .catch(e => next(e));
-    }).catch(e => next(e));
+    CommonIndex.getNewIndex('device')
+        .then(function (data) {
+            const { appid, developerid } = req.body;
+            device_index = data.index;
+            const qr_param = parseInt(data.index + 'a' + appid + 'a' + developerid, 16);
+            //去微信拿到临时代带参二维码 
+            return fetch('http://127.0.0.1:8080/wxapi/getqrcode?code=' + qr_param)
+        })
+        .then(function (qrcode) {
+            return qrcode.text()
+        })
+        .then(function (qrcode_url) {
+            if (qrcode_url) {
+                const new_device = new Device({
+                    deviceId: 'D' + device_index,
+                    qrcodeUrl: qrcode_url,
+                    fkey: '123456'
+                });
+                return new_device.save()
+            }
+            res.send('获取二维码失败');
+        })
+        .then(saveDevice => res.json(saveDevice))
+        .catch(e => next(e));
 };
 
-function bind(req, res, next){
+function bind(req, res, next) {
     //const {openid, deviceid, appid, developerid} = req.body;
-    Device.bind(req.body).then(function(device){
-        if(device){
-            // 要去查游戏优惠策略和扣费方式
-            Strategy.get(device).then(function(strategy){
-                // 更具策略给给用户添加应用
-                User.addApp(device, strategy).then(function(user){
-                    res.json(user)
-                }).catch(e=>next(e));
-            }).catch(e=>next(e));
-            
-        }else{
-            res.send('设备不存在');
-        }
-    }).catch(e=>next(e));
+    Device.bind(req.body)
+        .then(function (device) {
+            if (device) {
+                // 要去查游戏优惠策略和扣费方式
+                return Strategy.get(device);
+            } else {
+                res.send('设备不存在');
+            }
+        })
+        .then(function (strategy) {
+            // 更具策略给给用户添加应用
+            return User.addApp(device, strategy);
+        })
+        .then(function (user) {
+            res.json(user)
+        })
+        .catch(e => next(e));
 }
 
-export default { create, bind };
+export default { register, bind };

@@ -50,12 +50,22 @@ function getRandomNumber(req, res) {
   });
 }
 
-function deviceloginWithoutOpenId(req, res, next){
-  const {deviceid, appid, developid, mid} = req.body;
-  Device.checkoutDevice(req.body).then(function(device){
-    User.createOrUpdate(data.openId, appid, deviceid, developid);
-  }).catch(e=>next(e));
+function deviceloginWithoutOpenId(req, res, next) {
+  const { deviceid, appid, developid, mid } = req.body;
+  let _fkey = '';
+  Device.checkoutDevice(req.body)
+    .then(function (device) {
+      _fkey = device.fkey;
+      User.checkCoin(device.openId, device.appId);
+    })
+    .then(function(user){
+      if(user.apps[0].coins>0){
+        res.json({status:'ok',fkey:_fkey});
+      }
+      res.json({status:'fail',fkey:_fkey,msg:'余额不足，请充值！'});
+    })
+    .catch(e => next(e));
 
 }
 
-export default { login, getRandomNumber };
+export default { login, getRandomNumber, deviceloginWithoutOpenId };

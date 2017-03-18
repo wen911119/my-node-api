@@ -77,11 +77,12 @@ JiaoBenUsersDevicesSchema.statics = {
     return this.findOneAndUpdate({deviceId:deviceid, openId:''},{openId:openid,appid:appId,developerId:developerid}).exec();
   },
   checkoutDevice({deviceid, appid, developid, mid}){
+    // todo fkey没有更新
     return this.find({devideId:deviceid}).exec().then(function(deveice){
-      if(device.fkey+device.deviceId == mid){
+      if(device && (device.fkey+device.deviceId == mid)){
         return device
       }
-      const err = new APIError('非法授权！', httpStatus.NOT_FOUND);
+      const err = new APIError('没有授权！', httpStatus.NOT_FOUND);
       Promise.reject(err);
     });
   }

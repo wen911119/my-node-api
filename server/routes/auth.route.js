@@ -19,7 +19,5 @@ router.route('/random-number')
 router.route('/device-login')
   .post(validate(paramValidation.deviceloginWithoutOpenId), authCtrl.deviceloginWithoutOpenId);
 
-router.route('/device-login/:openid')
-  .post(validate(paramValidation.deviceloginWithOpenId), authCtrl.deviceloginWithOpenId);
 
 export default router;

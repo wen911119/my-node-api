@@ -112,7 +112,18 @@ UserSchema.statics = {
         return self.save({openId:data.openId, apps:[{appId:data.appId,coins:strategy.giftCoins,devicesNum:1}]}).exec()
       }
     });
+  },
+
+  checkCoin(openid, appid){
+    this.find({openId:openid,apps:{$elemMatch:{appId:appid}}},{"apps.$":1}).exec().then(function(user){
+      if(user){
+        return user
+      }
+      const err = new APIError('没有找到对应用户', httpStatus.NOT_FOUND);
+      Promise.reject(err);
+    });
   }
+
 
 
 };
