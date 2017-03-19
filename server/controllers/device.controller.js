@@ -11,8 +11,9 @@ function register(req, res, next) {
         .then(function (data) {
             const { appid, developerid } = req.body;
             device_index = data.index;
-            const qr_param = parseInt(data.index + 'a' + appid + 'a' + developerid, 16);
+            const qr_param = data.index + 'a' + appid + 'a' + developerid;
             //去微信拿到临时代带参二维码 
+            console.log(qr_param);
             return fetch('http://127.0.0.1:8080/wxapi/getqrcode?code=' + qr_param)
         })
         .then(function (qrcode) {
@@ -35,21 +36,23 @@ function register(req, res, next) {
 
 function bind(req, res, next) {
     //const {openid, deviceid, appid, developerid} = req.body;
+    let _device = null;
     Device.bind(req.body)
         .then(function (device) {
             if (device) {
                 // 要去查游戏优惠策略和扣费方式
+                _device = device;
                 return Strategy.get(device);
             } else {
-                res.send('设备不存在');
+                res.json({status:'fail', data:null, msg:'设备不存在'});
             }
         })
         .then(function (strategy) {
             // 更具策略给给用户添加应用
-            return User.addApp(device, strategy);
+            return User.addApp(_device, strategy);
         })
         .then(function (user) {
-            res.json(user)
+            res.json({status:'ok',data:user, msg:'成功'})
         })
         .catch(e => next(e));
 }

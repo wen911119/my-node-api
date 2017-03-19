@@ -74,7 +74,7 @@ JiaoBenUsersDevicesSchema.statics = {
   },
   bind({openid, deviceid, appid, developerid}){
     // this.save({deviceId:deviceid, openId:openid})
-    return this.findOneAndUpdate({deviceId:deviceid, openId:''},{openId:openid,appid:appId,developerId:developerid}).exec();
+    return this.findOneAndUpdate({deviceId:deviceid},{openId:openid,appId:appid,developerId:developerid}).exec();
   },
   checkoutDevice({deviceid, appid, developid, mid}){
     // todo fkey没有更新
