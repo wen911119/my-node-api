@@ -2,11 +2,12 @@ import Promise from 'bluebird';
 import mongoose from 'mongoose';
 import httpStatus from 'http-status';
 import APIError from '../helpers/APIError';
+import {randomStr} from '../../utils.js';
 
 /**
  * User Schema
  */
-const JiaoBenUsersDevicesSchema = new mongoose.Schema({
+const DevicesSchema = new mongoose.Schema({
   deviceId: {
     type: String,
     required: true,
@@ -62,13 +63,13 @@ const JiaoBenUsersDevicesSchema = new mongoose.Schema({
 /**
  * Methods
  */
-JiaoBenUsersDevicesSchema.method({
+DevicesSchema.method({
 });
 
 /**
  * Statics
  */
-JiaoBenUsersDevicesSchema.statics = {
+DevicesSchema.statics = {
   create(){
     return this.find()
   },
@@ -78,12 +79,14 @@ JiaoBenUsersDevicesSchema.statics = {
   },
   checkoutDevice({deviceid, appid, developid, mid}){
     // todo fkey没有更新
-    return this.find({devideId:deviceid}).exec().then(function(deveice){
+    return this.find({deviceId:deviceid}).exec().then(function(device){
       if(device && (device.fkey+device.deviceId == mid)){
-        return device
+        return this.update({deviceId:deviceid},{fkey:randomStr(10)}).exec();
+      }else{
+        return false
       }
-      const err = new APIError('没有授权！', httpStatus.NOT_FOUND);
-      Promise.reject(err);
+    }).then(function(updated_device){
+      return updated_device
     });
   }
 };
@@ -91,4 +94,4 @@ JiaoBenUsersDevicesSchema.statics = {
 /**
  * @typedef Device
  */
-export default mongoose.model('Device', JiaoBenUsersDevicesSchema);
+export default mongoose.model('Device', DevicesSchema);

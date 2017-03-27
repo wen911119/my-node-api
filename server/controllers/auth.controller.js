@@ -55,14 +55,20 @@ function deviceloginWithoutOpenId(req, res, next) {
   let _fkey = '';
   Device.checkoutDevice(req.body)
     .then(function (device) {
-      _fkey = device.fkey;
-      User.checkCoin(device.openId, device.appId);
-    })
-    .then(function(user){
-      if(user.apps[0].coins>0){
-        res.json({status:'ok',fkey:_fkey});
+      if (device) {
+        _fkey = device.fkey;
+        console.log(device, 999999999);
+        return User.checkCoin(device.openId, device.appId);
+      }else{
+        res.json({ status: 'fail', data: _fkey, msg: '设备没有注册或者非法授权' });
       }
-      res.json({status:'fail',fkey:_fkey,msg:'余额不足，请充值！'});
+    })
+    .then(function (user) {
+      console.log(123456789);
+      if (user.apps[0].coins > 0) {
+        res.json({ status: 'ok', data: _fkey });
+      }
+      res.json({ status: 'fail', data: _fkey, msg: '余额不足，请充值！' });
     })
     .catch(e => next(e));
 

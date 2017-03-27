@@ -1,7 +1,8 @@
 import Device from '../models/device.model'
 import CommonIndex from '../models/commonindex.model';
 import User from '../models/user.model';
-import Strategy from '../models/strategy.model';
+import Application from '../models/application.model';
+import {randomStr} from '../../utils.js';
 
 var fetch = require('node-fetch');
 let device_index = 0;
@@ -24,7 +25,7 @@ function register(req, res, next) {
                 const new_device = new Device({
                     deviceId: 'D' + device_index,
                     qrcodeUrl: qrcode_url,
-                    fkey: '123456'
+                    fkey: randomStr(10)
                 });
                 return new_device.save()
             }
@@ -42,17 +43,21 @@ function bind(req, res, next) {
             if (device) {
                 // 要去查游戏优惠策略和扣费方式
                 _device = device;
-                return Strategy.get(device);
+                return Application.get(req.body);
             } else {
-                res.json({status:'fail', data:null, msg:'设备不存在'});
+                res.json({ status: 'fail', data: null, msg: '设备不存在' });
             }
         })
-        .then(function (strategy) {
+        .then(function (appInfo) {
             // 更具策略给给用户添加应用
-            return User.addApp(_device, strategy);
+            if (appInfo) {
+                return User.addApp(_device, appInfo);
+            } else {
+                res.json({ status: 'fail', data: null, msg: '没找到应用信息' });
+            }
         })
         .then(function (user) {
-            res.json({status:'ok',data:user, msg:'成功'})
+            res.json({ status: 'ok', data: user, msg: '成功' })
         })
         .catch(e => next(e));
 }

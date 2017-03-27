@@ -50,7 +50,7 @@ StrategySchema.statics = {
   
   get({appid, developerid}){
     // this.save({deviceId:deviceid, openId:openid})
-    return this.find({appId:appid, developerId:developerid}).exec();
+    return this.findOne({appId:appid, developerId:developerid}).exec();
   }
 };
 

@@ -31,8 +31,8 @@ export default {
   deviceloginWithoutOpenId:{
     body:{
       deviceid:Joi.string().regex(/^D[0-9]+$/).required(),
-      appid:Joi.string().regex(/^G[0-9]+$/).required(),
-      developerid:Joi.string().hex().required()
+      appid:Joi.string().regex(/^A[0-9]+$/).required(),
+      developerid:Joi.string().required()
     }
   },
 
@@ -58,8 +58,14 @@ export default {
   // 注册一台新设备
   registerDevice:{
     body:{
-      appid:Joi.string().hex().required(),
-      developerid:Joi.string().hex().required()
+      appid:Joi.string().required(),
+      developerid:Joi.string().required()
     }
+  },
+  // 创建新应用
+  application_add:{
+    deviceid:Joi.string().regex(/^D[0-9]+$/).required(),
+    appname:Joi.string().required(),
+    strategy:Joi.string().required()
   }
 };
