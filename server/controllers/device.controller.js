@@ -12,9 +12,8 @@ function register(req, res, next) {
         .then(function (data) {
             const { appid, developerid } = req.body;
             device_index = data.index;
-            const qr_param = data.index + 'a' + appid + 'a' + developerid;
+            const qr_param = 'D'+data.index + 'a' + appid + 'a' + developerid;
             //去微信拿到临时代带参二维码 
-            console.log(qr_param);
             return fetch('http://127.0.0.1:8080/wxapi/getqrcode?code=' + qr_param)
         })
         .then(function (qrcode) {
@@ -29,10 +28,10 @@ function register(req, res, next) {
                 });
                 return new_device.save()
             }
-            res.send('获取二维码失败');
+            return Promise.reject({ status: 'fail', data: null, msg: '获取二维码失败' })
         })
-        .then(saveDevice => res.json(saveDevice))
-        .catch(e => next(e));
+        .then(saveDevice => res.json({ status: 'fail', data: saveDevice, msg: '设备注册成功' }))
+        .catch(e => res.json(e));
 };
 
 function bind(req, res, next) {
