@@ -91,37 +91,48 @@ UserSchema.statics = {
       .exec();
   },
 
-  addApp(data, appInfo){
+  addApp(data, appInfo) {
     let self = this;
-    return self.findOne({openId:data.openId}).exec().then(function(user){
-      if(user){
+    return self.findOne({ openId: data.openId }).exec().then(function (user) {
+      if (user) {
         // 用户存在
         // 还要判断应用存不存在
-        if(user.apps && user.apps.some(item=>item.appId == data.appId)){
+        if (user.apps && user.apps.some(item => item.appId == data.appId)) {
           // 应用已经存在了，只要更新下该应用的devicesNum
-          return self.update({openId:data.openId,apps:{$elemMatch:{appId:data.appId}}},{$inc:{"apps.$.devicesNum":1}}).exec()
+          return self.update({ openId: data.openId, apps: { $elemMatch: { appId: data.appId } } }, { $inc: { "apps.$.devicesNum": 1 } }).exec()
 
-        }else{
+        } else {
           // 应用不存在
-          return self.update({openId:data.openId},{$addToSet:{apps:{appId:data.appId,coins:appInfo.strategy.giftCoins,devicesNum:1}}}).exec()
+          return self.update({ openId: data.openId }, { $addToSet: { apps: { appId: data.appId, coins: appInfo.strategy.giftCoins, devicesNum: 1 } } }).exec()
         }
-      }else{
+      } else {
         // 用户不存在
         // 要创建一个用户
         // 但同时也给用户添加了一个app,这个app的总送点卡数需要先查出来
-        return self.create({openId:data.openId, apps:[{appId:data.appId,coins:appInfo.strategy.giftCoins,devicesNum:1}]})
+        return self.create({ openId: data.openId, apps: [{ appId: data.appId, coins: appInfo.strategy.giftCoins, devicesNum: 1 }] })
       }
     });
   },
 
-  checkCoin(openid, appid){
-    this.find({openId:openid,apps:{$elemMatch:{appId:appid}}},{"apps.$":1}).exec().then(function(user){
-      if(user){
-        return user
-      }
-      const err = new APIError('没有找到对应用户', httpStatus.NOT_FOUND);
-      Promise.reject(err);
-    });
+  checkCoin({openId, fkey, appId}) {
+    console.log(openId,fkey, appId, 988888);
+    return this.findOne({ openId: openId, apps: { $elemMatch: { appId: appId } } }, { "apps.$": 1 }).exec()
+      .then(function (user) {
+        if (user) {
+          console.log(user, 11111111111)
+          if (user.apps[0].coins > 0) {
+            return { status: 'ok', data: fkey, msg:'登录成功' }
+          } else {
+            return Promise.reject({ status: 'fail', data: fkey, msg: '余额不足，请充值！' })
+          }
+        } else {
+          return Promise.reject({ status: 'fail', data: '', msg: '该微信用户未找到' });
+        }
+      })
+      .catch(e=>{
+        console.log(e);
+        return Promise.reject(e);
+      });
   }
 
 

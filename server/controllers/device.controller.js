@@ -45,7 +45,7 @@ function bind(req, res, next) {
                 _device = device;
                 return Application.get(req.body);
             } else {
-                res.json({ status: 'fail', data: null, msg: '设备不存在' });
+                return Promise.reject({ status: 'fail', data: null, msg: '设备不存在' })
             }
         })
         .then(function (appInfo) {
@@ -53,13 +53,13 @@ function bind(req, res, next) {
             if (appInfo) {
                 return User.addApp(_device, appInfo);
             } else {
-                res.json({ status: 'fail', data: null, msg: '没找到应用信息' });
+                return Promise.reject({ status: 'fail', data: null, msg: '没找到应用信息' });
             }
         })
         .then(function (user) {
             res.json({ status: 'ok', data: user, msg: '成功' })
         })
-        .catch(e => next(e));
+        .catch(e => res.json(e));
 }
 
 export default { register, bind };

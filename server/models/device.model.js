@@ -2,7 +2,7 @@ import Promise from 'bluebird';
 import mongoose from 'mongoose';
 import httpStatus from 'http-status';
 import APIError from '../helpers/APIError';
-import {randomStr} from '../../utils.js';
+import { randomStr } from '../../utils.js';
 
 /**
  * User Schema
@@ -16,9 +16,9 @@ const DevicesSchema = new mongoose.Schema({
   openId: {
     type: String
   },
-  qrcodeUrl:{
-    type:String,
-    required:true
+  qrcodeUrl: {
+    type: String,
+    required: true
   },
   deviceType: {
     type: String
@@ -39,7 +39,7 @@ const DevicesSchema = new mongoose.Schema({
   },
   fkey: {
     type: String,
-    required:true
+    required: true
   },
   lastLoginTime: {
     type: Date
@@ -70,24 +70,28 @@ DevicesSchema.method({
  * Statics
  */
 DevicesSchema.statics = {
-  create(){
+  create() {
     return this.find()
   },
-  bind({openid, deviceid, appid, developerid}){
+  bind({ openid, deviceid, appid, developerid }) {
     // this.save({deviceId:deviceid, openId:openid})
-    return this.findOneAndUpdate({deviceId:deviceid},{openId:openid,appId:appid,developerId:developerid}).exec();
+    return this.findOneAndUpdate({ deviceId: deviceid }, { openId: openid, appId: appid, developerId: developerid }).exec();
   },
-  checkoutDevice({deviceid, appid, developid, mid}){
-    // todo fkey没有更新
-    return this.find({deviceId:deviceid}).exec().then(function(device){
-      if(device && (device.fkey+device.deviceId == mid)){
-        return this.update({deviceId:deviceid},{fkey:randomStr(10)}).exec();
-      }else{
-        return false
-      }
-    }).then(function(updated_device){
-      return updated_device
-    });
+  checkoutDevice({ deviceid, appid, developid, mid }) {
+    let self = this;
+    return this.findOne({ deviceId: deviceid, appId: appid, developId: developid }).exec()
+      .then(function (device) {
+        if (device && (device.fkey + device.deviceId == mid)) {
+          //return self.update({ deviceId: deviceid }, { fkey: randomStr(10) }).exec();
+          return self.findOneAndUpdate({ deviceId: deviceid }, { fkey: '123456' }, {returnNewDocument:true}).exec();          
+        } else {
+          return Promise.reject({ status: 'fail', data: '', msg: '设备没有注册或者非法授权' });
+        }
+      })
+      .catch(e=>{
+        console.log(e);
+        return Promise.reject(e);
+      });
   }
 };
 

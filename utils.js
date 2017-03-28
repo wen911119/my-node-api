@@ -1,4 +1,4 @@
-export function randomStr(length) {
+export function randomStr(a) {
     var d,
         e,
         b = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
