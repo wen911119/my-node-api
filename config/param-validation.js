@@ -67,5 +67,14 @@ export default {
     deviceid:Joi.string().regex(/^D[0-9]+$/).required(),
     appname:Joi.string().required(),
     strategy:Joi.string().required()
+  },
+
+  //开发者注册
+  developerRegister:{
+    username:Joi.string().required(),
+    password:Joi.string().required(),
+    email:Joi.string().regex(/^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/).required(),
+    phone:Joi.string().regex(/^1\d{10}/).required(),
+    verification_code:Joi.string().required()
   }
 };

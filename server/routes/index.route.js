@@ -3,6 +3,7 @@ import userRoutes from './user.route';
 import authRoutes from './auth.route';
 import deviceRoutes from './device.route';
 import applicationRoutes from './application.route';
+import developerRoutes from './developer.route';
 
 
 const router = express.Router(); // eslint-disable-line new-cap
@@ -23,5 +24,6 @@ router.use('/device', deviceRoutes);
 
 
 router.use('/application', applicationRoutes);
+router.use('/developer', developerRoutes);
 
 export default router;
