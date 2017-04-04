@@ -8,12 +8,13 @@ let application_index = 0;
 function add(req, res, next) {
     CommonIndex.getNewIndex('application')
         .then(function (data) {
-            let { developerid, appname,  strategy} = req.body;
+            let {appname,  strategy} = req.body;
+
             strategy = JSON.parse(strategy);
             application_index = data.index;
             let new_app = new Application({
                 appId:'A'+application_index,
-                developerId:developerid,
+                developerId:req.user.developerid,
                 appName:appname,
                 strategy:strategy
             });

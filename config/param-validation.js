@@ -28,53 +28,59 @@ export default {
     }
   },
 
-  deviceloginWithoutOpenId:{
-    body:{
-      deviceid:Joi.string().regex(/^D[0-9]+$/).required(),
-      appid:Joi.string().regex(/^A[0-9]+$/).required(),
-      developerid:Joi.string().required()
+  deviceloginWithoutOpenId: {
+    body: {
+      deviceid: Joi.string().regex(/^D[0-9]+$/).required(),
+      appid: Joi.string().regex(/^A[0-9]+$/).required(),
+      developerid: Joi.string().required()
     }
   },
 
-  deviceloginWithOpenId:{
-    body:{
-      deviceid:Joi.string().regex(/^D[0-9]+$/).required(),
-      appid:Joi.string().regex(/^G[0-9]+$/).required(),
-      developerid:Joi.string().hex().required()
+  deviceloginWithOpenId: {
+    body: {
+      deviceid: Joi.string().regex(/^D[0-9]+$/).required(),
+      appid: Joi.string().regex(/^G[0-9]+$/).required(),
+      developerid: Joi.string().hex().required()
     },
     params: {
-      openid:Joi.string().hex().required()
+      openid: Joi.string().hex().required()
     }
   },
 
-  bindDevice:{
-    body:{
-      deviceid:Joi.string().required(),
-      openid:Joi.string().required(),
-      appid:Joi.string().required(),
-      developerid:Joi.string().required()
+  bindDevice: {
+    body: {
+      deviceid: Joi.string().required(),
+      openid: Joi.string().required(),
+      appid: Joi.string().required(),
+      developerid: Joi.string().required()
     }
   },
   // 注册一台新设备
-  registerDevice:{
-    body:{
-      appid:Joi.string().required(),
-      developerid:Joi.string().required()
+  registerDevice: {
+    body: {
+      appid: Joi.string().required(),
+      developerid: Joi.string().required()
     }
   },
   // 创建新应用
-  application_add:{
-    deviceid:Joi.string().regex(/^D[0-9]+$/).required(),
-    appname:Joi.string().required(),
-    strategy:Joi.string().required()
+  application_add: {
+    body: {
+      appname: Joi.string().required(),
+      strategy: Joi.string().required()
+    }
   },
 
   //开发者注册
-  developerRegister:{
-    username:Joi.string().required(),
-    password:Joi.string().required(),
-    email:Joi.string().regex(/^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/).required(),
-    phone:Joi.string().regex(/^1\d{10}/).required(),
-    verification_code:Joi.string().required()
+  developerRegister: {
+    body: {
+      password: Joi.string().required(),
+      email: Joi.string().regex(/^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/).required(),
+      phone: Joi.string().regex(/^1\d{10}/).required()
+    }
+  },
+  test: {
+    query: {
+      test: Joi.string().required()
+    }
   }
 };

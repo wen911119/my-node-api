@@ -12,10 +12,6 @@ const DeveloperSchema = new mongoose.Schema({
         required: true,
         match: [/^J[0-9]+/, '{PATH} ({VALUE}) 不是合法的开发者编号。']
     },
-    userName: {
-        type: String,
-        required: true
-    },
     password: {
         type: String,
         required: true
@@ -30,7 +26,12 @@ const DeveloperSchema = new mongoose.Schema({
         match: [/^1\d{10}/, '{PATH} ({VALUE}) 不是合法的手机号。']
     },
     coins: {
-        type: Number
+        type: Number,
+        default: 0
+    },
+    active:{
+        type:Boolean,
+        default: false
     },
     createdAt: {
         type: Date,
@@ -54,12 +55,18 @@ DeveloperSchema.method({
  * Statics
  */
 DeveloperSchema.statics = {
-    register({ developerid, username, password, email, phone }) {
-        return this.create({ developerId: developerid, userName: username, password: password, email: email, phone: phone }).exec();
+    createNewDeveloper({ developerid, password, email, phone }) {
+        return this.create({ developerId: developerid, password: password, email: email, phone: phone }).exec();
+    },
+    queryByEmail({email}){
+        return this.findOne({email: email}).exec();
+    },
+    checkDeveloper({email, password}){
+        return this.findOne({email: email, password: password}).exec();        
     }
 };
 
 /**
  * @typedef Device
  */
-export default mongoose.model('Application', DeveloperSchema);
+export default mongoose.model('Developer', DeveloperSchema);

@@ -14,7 +14,7 @@ router.route('/login')
 /** GET /api/auth/random-number - Protected route,
  * needs token returned by the above as header. Authorization: Bearer {token} */
 router.route('/random-number')
-  .get(expressJwt({ secret: config.jwtSecret }), authCtrl.getRandomNumber);
+  .get(validate(paramValidation.test),expressJwt({ secret: config.jwtSecret }), authCtrl.getRandomNumber);
 
 router.route('/device-login')
   .post(validate(paramValidation.deviceloginWithoutOpenId), authCtrl.deviceloginWithoutOpenId);

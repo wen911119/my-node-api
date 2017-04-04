@@ -30,7 +30,7 @@ function register(req, res, next) {
             }
             return Promise.reject({ status: 'fail', data: null, msg: '获取二维码失败' })
         })
-        .then(saveDevice => res.json({ status: 'fail', data: saveDevice, msg: '设备注册成功' }))
+        .then(saveDevice => res.json({ status: 'ok', data: saveDevice, msg: '设备注册成功' }))
         .catch(e => res.json(e));
 };
 
