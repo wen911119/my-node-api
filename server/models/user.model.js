@@ -115,11 +115,9 @@ UserSchema.statics = {
   },
 
   checkCoin({openId, fkey, appId}) {
-    console.log(openId,fkey, appId, 988888);
     return this.findOne({ openId: openId, apps: { $elemMatch: { appId: appId } } }, { "apps.$": 1 }).exec()
       .then(function (user) {
         if (user) {
-          console.log(user, 11111111111)
           if (user.apps[0].coins > 0) {
             return { status: 'ok', data: fkey, msg:'登录成功' }
           } else {

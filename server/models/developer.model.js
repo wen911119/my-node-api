@@ -63,6 +63,12 @@ DeveloperSchema.statics = {
     },
     checkDeveloper({email, password}){
         return this.findOne({email: email, password: password}).exec();        
+    },
+    addCoin({developerid, denomination}){
+        return this.findOneAndUpdate({ developerId: developerid }, { $inc:{coins: denomination} }, {returnNewDocument:true}).exec();
+    },
+    reduceCoin({developerid, denomination}){
+        return this.findOneAndUpdate({ developerId: developerid }, { $inc:{coins: -denomination} }, {returnNewDocument:true}).exec();
     }
 };
 

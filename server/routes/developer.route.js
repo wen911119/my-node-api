@@ -11,6 +11,9 @@ const router = express.Router(); // eslint-disable-line new-cap
 router.route('/register')
   .post(validate(paramValidation.developerRegister), developerCtrl.register);
 
+router.route('/useSuperRedeemCode')
+  .post(validate(paramValidation.useSuperRedeemCode),expressJwt({ secret: config.jwtSecret }), developerCtrl.useSuperRedeemCode);
+
 /** GET /api/auth/random-number - Protected route,
  * needs token returned by the above as header. Authorization: Bearer {token} */
 

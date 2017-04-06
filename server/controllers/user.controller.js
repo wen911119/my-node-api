@@ -27,7 +27,9 @@ import User from '../models/user.model';
  * @returns {User}
  */
 function create(req, res, next) {
-  User.createOrUpdate(req.body.openid, req.body.deviceid).then(result => res.json(result)).catch(e => next(e));
+  User.createOrUpdate(req.body.openid, req.body.deviceid)
+      .then(result => res.json(result))
+      .catch(e => next(e));
 }
 
 /**

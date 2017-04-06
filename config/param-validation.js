@@ -82,5 +82,10 @@ export default {
     query: {
       test: Joi.string().required()
     }
+  },
+  useSuperRedeemCode:{
+    body: {
+      redeemCode: Joi.string().required()
+    }
   }
 };

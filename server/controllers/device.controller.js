@@ -56,6 +56,7 @@ function bind(req, res, next) {
             }
         })
         .then(function (user) {
+            // todo给用户送的点卡要从所属开发者账号内扣除
             res.json({ status: 'ok', data: user, msg: '成功' })
         })
         .catch(e => res.json(e));

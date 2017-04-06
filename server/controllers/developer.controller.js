@@ -5,6 +5,7 @@ import config from '../../config/config';
 import User from '../models/user.model';
 import Developer from '../models/developer.model';
 import CommonIndex from '../models/commonindex.model';
+import SuperRedeemCode from '../models/superredeemcode.model';
 
 
 
@@ -64,4 +65,18 @@ function login(req, res, next) {
     })
 }
 
-export default { register };
+function useSuperRedeemCode(req, res, next){
+  SuperRedeemCode.use({developerid:req.user.developerid, redeemcode:req.body.redeemcode})
+    .then(function(data){
+      return Developer.addCoin({developerid:req.user.developerid, denomination:data.denomination});
+    })
+    .then(function(data){
+      res.json({status:'ok', data:data.coins, msg:'充值成功'});
+    })
+    .catch(e=>res.json(e));
+}
+
+function genNormalRedeemCode(req, res, next){
+  Developer.
+}
+export default { register, login };
