@@ -22,8 +22,8 @@ const NormalRedeemCodeSchema = new mongoose.Schema({
         type: String
     },
     // 创建者的开发者id
-    createBy:{
-        type:String
+    createBy: {
+        type: String
     },
     // 创建时间
     createdAt: {
@@ -52,23 +52,35 @@ SuperRedeemCodeSchema.method({
  * Statics
  */
 SuperRedeemCodeSchema.statics = {
-    create({developerid, denomination}){
-        return this.create({createBy:developerid, denomination:denomination, value:randomStr(12)});
+    create({ developerid, denomination }) {
+        return this.create({ createBy: developerid, denomination: denomination, value: randomStr(12) });
     },
 
     use({ developerid, redeemcode }) {
         // 先看下兑换码是不是存在并且没有用过
         let self = this;
-        this.findOne({value:redeemcode})
+        this.findOne({ value: redeemcode })
             .exec()
-            .then(function(data){
-                if(data && !data.useAt){
-                    return self.findOneAndUpdate({value:redeemcode},{usedBy:developerid, useAt:Date.now}, {returnNewDocument:true}).exec()
-                }else{
-                    return Promise.reject({ status: 'fail', data: '', msg: '兑换码无效' })                                                
+            .then(function (data) {
+                if (data && !data.useAt) {
+                    return self.findOneAndUpdate({ value: redeemcode }, { usedBy: developerid, useAt: Date.now }, { returnNewDocument: true }).exec()
+                } else {
+                    return Promise.reject({ status: 'fail', data: '', msg: '兑换码无效' })
                 }
             })
-            .catch(e=>Promise.reject(e));  
+            .catch(e => Promise.reject(e));
+    },
+
+    check(redeemcode) {
+        return this.findOne({ value: redeemcode }).exec()
+            .then(function (code) {
+                if (code && !code.useAt) {
+                    return code
+                } else {
+                    return Promise.reject({ status: 'fail', data: '', msg: '兑换码无效' })
+                }
+            })
+            .catch(e => Promise.reject(e));
     }
 };
 

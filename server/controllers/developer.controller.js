@@ -6,6 +6,7 @@ import User from '../models/user.model';
 import Developer from '../models/developer.model';
 import CommonIndex from '../models/commonindex.model';
 import SuperRedeemCode from '../models/superredeemcode.model';
+import NormalRedeemCode from '../models/normalredeemcode.model';
 
 
 
@@ -77,6 +78,18 @@ function useSuperRedeemCode(req, res, next){
 }
 
 function genNormalRedeemCode(req, res, next){
-  Developer.
+  Developer.reduceCoin({developerid:req.user.developerid, denomination:req.body.denomination})
+           .then(function(data){
+              return NormalRedeemCode.create({developerid:req.user.developerid, denomination:req.body.denomination})
+           })
+           .then(function(code){
+            res.json({
+              status:'ok',
+              data:code,
+              msg:'生成成功'
+
+            });
+           })
+           .catch(e=>res.json(e));
 }
 export default { register, login };

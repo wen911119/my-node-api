@@ -60,16 +60,8 @@ UserSchema.statics = {
    * @param {ObjectId} id - The objectId of user.
    * @returns {Promise<User, APIError>}
    */
-  get(id) {
-    return this.findById(id)
-      .exec()
-      .then((user) => {
-        if (user) {
-          return user;
-        }
-        const err = new APIError('No such user exists!', httpStatus.NOT_FOUND);
-        return Promise.reject(err);
-      });
+  get({openid}) {
+    return this.findOne({openId:openid}).exec();
   },
 
   /**新增或者更新user */
@@ -77,20 +69,7 @@ UserSchema.statics = {
     return this.update({ openId: openid }, { $push: { devices: { deviceId: deviceid } } }, { upsert: true }).exec();
   },
 
-  /**
-   * List users in descending order of 'createdAt' timestamp.
-   * @param {number} skip - Number of users to be skipped.
-   * @param {number} limit - Limit number of users to be returned.
-   * @returns {Promise<User[]>}
-   */
-  list({ skip = 0, limit = 50 } = {}) {
-    return this.find()
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit)
-      .exec();
-  },
-
+  
   addApp(data, appInfo) {
     let self = this;
     return self.findOne({ openId: data.openId }).exec().then(function (user) {
@@ -114,12 +93,12 @@ UserSchema.statics = {
     });
   },
 
-  checkCoin({openId, fkey, appId}) {
+  checkCoin({ openId, fkey, appId }) {
     return this.findOne({ openId: openId, apps: { $elemMatch: { appId: appId } } }, { "apps.$": 1 }).exec()
       .then(function (user) {
         if (user) {
           if (user.apps[0].coins > 0) {
-            return { status: 'ok', data: fkey, msg:'登录成功' }
+            return { status: 'ok', data: fkey, msg: '登录成功' }
           } else {
             return Promise.reject({ status: 'fail', data: fkey, msg: '余额不足，请充值！' })
           }
@@ -127,10 +106,14 @@ UserSchema.statics = {
           return Promise.reject({ status: 'fail', data: '', msg: '该微信用户未找到' });
         }
       })
-      .catch(e=>{
+      .catch(e => {
         console.log(e);
         return Promise.reject(e);
       });
+  },
+
+  addCoin({ openid, appid, coinNum }) {
+    return this.update({ openId: openid, apps: { $elemMatch: { appId: appid } } }, { $inc: { "appa.$.coins": coinNum } }, { returnNewDocument: true }).exec();
   }
 
 

@@ -1,4 +1,6 @@
 import User from '../models/user.model';
+import NormalRedeemCode from '../models/normalredeemcode.model';
+
 
 /**
  * Load user and append to req.
@@ -28,48 +30,40 @@ import User from '../models/user.model';
  */
 function create(req, res, next) {
   User.createOrUpdate(req.body.openid, req.body.deviceid)
-      .then(result => res.json(result))
-      .catch(e => next(e));
+    .then(result => res.json(result))
+    .catch(e => next(e));
 }
 
-/**
- * Update existing user
- * @property {string} req.body.username - The username of user.
- * @property {string} req.body.mobileNumber - The mobileNumber of user.
- * @returns {User}
- */
-// function update(req, res, next) {
-//   const user = req.user;
-//   user.username = req.body.username;
-//   user.mobileNumber = req.body.mobileNumber;
+function useNormalRedeemCode(req, res, next) {
+  // 先要去检查充值码是否有效
+  NormalRedeemCode.check(req.body.redeemcode)
+    .then(function (validCode) {
+      return User.addCoin({ openid: req.body.openid, appid: validCode.appId, coinNum: validCode.denomination })
+    })
+    .then(function (user) {
+      res.json({
+        status: 'ok',
+        data: user,
+        msg: '充值成功'
+      });
+    })
+    .catch(e => res.json(e));
+}
 
-//   user.save()
-//     .then(savedUser => res.json(savedUser))
-//     .catch(e => next(e));
-// }
+function getUserInfo(req, res, next) {
+  User.get(req.body)
+    .then(function(userInfo){
+      if(userInfo){
+        res.json({status:'ok', data:userInfo, msg:'查询成功'});
+      }else{
+        res.json({
+          status:'fail',
+          data:'',
+          msg:'用户不存在'
+        });
+      }
+    })
+    .catch(e=>res.json(e));
+}
 
-/**
- * Get user list.
- * @property {number} req.query.skip - Number of users to be skipped.
- * @property {number} req.query.limit - Limit number of users to be returned.
- * @returns {User[]}
- */
-// function list(req, res, next) {
-//   const { limit = 50, skip = 0 } = req.query;
-//   User.list({ limit, skip })
-//     .then(users => res.json(users))
-//     .catch(e => next(e));
-// }
-
-/**
- * Delete user.
- * @returns {User}
- */
-// function remove(req, res, next) {
-//   const user = req.user;
-//   user.remove()
-//     .then(deletedUser => res.json(deletedUser))
-//     .catch(e => next(e));
-// }
-
-export default { create};
+export default { create, useNormalRedeemCode };

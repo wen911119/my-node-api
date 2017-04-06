@@ -87,5 +87,21 @@ export default {
     body: {
       redeemCode: Joi.string().required()
     }
+  },
+  genNormalRedeemCode:{
+    body: {
+      denomination: Joi.number().required()
+    }
+  },
+  useNormalRedeemCode:{
+    body: {
+      openid: Joi.string().required(),
+      redeemcode:Joi.string().required()
+    }
+  },
+  getUserInfo:{
+    body: {
+      openid: Joi.string().required()
+    }
   }
 };
