@@ -12,11 +12,6 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  // 用户点卡
-  coins: {
-    type: Number,
-    default: 0
-  },
   // 用户购买的应用
   apps: {
     type: Array,
@@ -60,8 +55,19 @@ UserSchema.statics = {
    * @param {ObjectId} id - The objectId of user.
    * @returns {Promise<User, APIError>}
    */
-  get({openid}) {
-    return this.findOne({openId:openid}).exec();
+  get({ openid }) {
+    return this.findOne({ openId: openid }).exec();
+  },
+
+  checkout(openid) {
+    return this.findOne({ openId: openid }).exec()
+      .then(function (user) {
+        if (user) {
+          return user
+        }
+        return this.create({ openId: openid }).exec();
+      })
+      .catch(e => Promise.reject(e));
   },
 
   /**新增或者更新user */
@@ -69,8 +75,8 @@ UserSchema.statics = {
     return this.update({ openId: openid }, { $push: { devices: { deviceId: deviceid } } }, { upsert: true }).exec();
   },
 
-  
-  addApp(data, appInfo) {
+
+  addApp(appid) {
     let self = this;
     return self.findOne({ openId: data.openId }).exec().then(function (user) {
       if (user) {
@@ -91,6 +97,15 @@ UserSchema.statics = {
         return self.create({ openId: data.openId, apps: [{ appId: data.appId, coins: appInfo.strategy.giftCoins, devicesNum: 1 }] })
       }
     });
+  },
+
+  // 给用户添加一个应用
+  addApp(openid, appid, giftCoins) {
+    return this.findOneAndUpdate({ openId: openid }, { $addToSet: { apps: { appId: appid, coins: giftCoins, devicesNum: 1 } } }, { returnNewDocument: true }).exec();
+  },
+  // 给用户一个已经存在的应用增加一个设备
+  addDeviceToApp(opened, appid) {
+    return this.findOneAndUpdate({ openId: openid, apps: { $elemMatch: { appId: appid } } }, { $inc: { "apps.$.devicesNum": 1 } }, { returnNewDocument: true }).exec();
   },
 
   checkCoin({ openId, fkey, appId }) {
@@ -114,6 +129,17 @@ UserSchema.statics = {
 
   addCoin({ openid, appid, coinNum }) {
     return this.update({ openId: openid, apps: { $elemMatch: { appId: appid } } }, { $inc: { "appa.$.coins": coinNum } }, { returnNewDocument: true }).exec();
+  },
+  /**
+   * 根据appid查用户
+   * @param {*} appid 
+   */
+  queryByAppId(appid) {
+    return this.find({ apps: { $elemMatch: { appId: appid } } }).exec();
+  },
+
+  queryByOpenIdAndAppId(openid, appid) {
+    return this.findOne({ openId: openId, apps: { $elemMatch: { appId: appid } } }, { "apps.$": 1 }).exec();
   }
 
 

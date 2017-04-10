@@ -50,7 +50,14 @@ ApplicationSchema.method({
 ApplicationSchema.statics = {
     get({deviceid, appid, developerid}){
         return this.findOne({appId:appid, developerId:developerid}).exec();
+    },
+    getAppListByDevelopId(developerid){
+        return this.find({developerId:developerid}).exec();        
+    },
+    queryByAppId(appid){
+        return this.findOne({appId:appid}).exec();        
     }
+
 };
 
 /**

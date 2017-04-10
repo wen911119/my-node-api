@@ -17,9 +17,14 @@ const NormalRedeemCodeSchema = new mongoose.Schema({
     denomination: {
         type: Number
     },
+    // 属于哪个应用，appid
+    belongTo: {
+        type: String
+    },
     // 使用者的openid
     usedBy: {
-        type: String
+        type: String,
+        default: ''
     },
     // 创建者的开发者id
     createBy: {
@@ -52,25 +57,26 @@ SuperRedeemCodeSchema.method({
  * Statics
  */
 SuperRedeemCodeSchema.statics = {
-    create({ developerid, denomination }) {
-        return this.create({ createBy: developerid, denomination: denomination, value: randomStr(12) });
+    // 创建一条普通兑换码
+    create({ developerid, denomination, appid }) {
+        return this.create({ createBy: developerid, denomination: denomination, belongTo: appid, value: randomStr(12) });
     },
-
-    use({ developerid, redeemcode }) {
+    // 使用一条兑换码
+    use({ openid, redeemcode }) {
         // 先看下兑换码是不是存在并且没有用过
         let self = this;
         this.findOne({ value: redeemcode })
             .exec()
             .then(function (data) {
                 if (data && !data.useAt) {
-                    return self.findOneAndUpdate({ value: redeemcode }, { usedBy: developerid, useAt: Date.now }, { returnNewDocument: true }).exec()
+                    return self.findOneAndUpdate({ value: redeemcode }, { usedBy: openid, useAt: Date.now }, { returnNewDocument: true }).exec()
                 } else {
                     return Promise.reject({ status: 'fail', data: '', msg: '兑换码无效' })
                 }
             })
             .catch(e => Promise.reject(e));
     },
-
+    // 检查一条兑换码是否有效，包括是否存在和是否使用过
     check(redeemcode) {
         return this.findOne({ value: redeemcode }).exec()
             .then(function (code) {
@@ -81,8 +87,15 @@ SuperRedeemCodeSchema.statics = {
                 }
             })
             .catch(e => Promise.reject(e));
+    },
+
+    // 查询出某个开发者创建的，还没有使用过的兑换码
+    getAllFreshRedeemCodeByAppIdAndDeveloperId(appid, developerid) {
+        return this.find({ belongTo: appid, createBy: developerid, usedBy: '' }).exec();
     }
 };
+
+
 
 /**
  * @typedef SuperRedeemCode

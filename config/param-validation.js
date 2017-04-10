@@ -103,5 +103,11 @@ export default {
     body: {
       openid: Joi.string().required()
     }
+  },
+
+  getAllFreshRedeemCodeByAppId:{
+    body: {
+      appid:Joi.string().required()
+    }
   }
 };

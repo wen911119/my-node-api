@@ -14,6 +14,12 @@ router.route('/register')
 router.route('/useSuperRedeemCode')
   .post(validate(paramValidation.useSuperRedeemCode),expressJwt({ secret: config.jwtSecret }), developerCtrl.useSuperRedeemCode);
 
+router.route('/genNormalRedeemCode')
+  .post(validate(paramValidation.genNormalRedeemCode),expressJwt({ secret: config.jwtSecret }), developerCtrl.genNormalRedeemCode);
+
+router.route('/getAllFreshRedeemCodeByAppId')
+  .post(validate(paramValidation.getAllFreshRedeemCodeByAppId),expressJwt({ secret: config.jwtSecret }), developerCtrl.getAllFreshRedeemCodeByAppId);
+
 /** GET /api/auth/random-number - Protected route,
  * needs token returned by the above as header. Authorization: Bearer {token} */
 

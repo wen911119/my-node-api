@@ -14,20 +14,15 @@ const DevicesSchema = new mongoose.Schema({
     match: [/^D[0-9]+/, '{PATH} ({VALUE}) 不是合法的设备编号。']
   },
   openId: {
-    type: String
+    type: String,
+    default: ''
   },
   qrcodeUrl: {
     type: String,
     required: true
   },
-  deviceType: {
-    type: String
-  },
-  deviceModel: {
-    type: String
-  },
-  devicePixels: {
-    type: String
+  deviceInfo: {
+    type: Object
   },
   appId: {
     type: String,
@@ -83,15 +78,84 @@ DevicesSchema.statics = {
       .then(function (device) {
         if (device && (device.fkey + device.deviceId == mid)) {
           //return self.update({ deviceId: deviceid }, { fkey: randomStr(10) }).exec();
-          return self.findOneAndUpdate({ deviceId: deviceid }, { fkey: '123456' }, {returnNewDocument:true}).exec();          
+          return self.findOneAndUpdate({ deviceId: deviceid }, { fkey: '123456' }, { returnNewDocument: true }).exec();
         } else {
           return Promise.reject({ status: 'fail', data: '', msg: '设备没有注册或者非法授权' });
         }
       })
-      .catch(e=>{
+      .catch(e => {
         console.log(e);
         return Promise.reject(e);
       });
+  },
+  /**
+   * 添加一台“裸”设备（缺省openid）
+   * @param {*} deviceid 
+   * @param {*} developerid 
+   * @param {*} appid 
+   * @param {*} deviceinfo 
+   * @param {*} qrcodeurl 
+   */
+  addBareDevice(deviceid, developerid, appid, deviceinfo, qrcodeurl) {
+    return this.create({
+      deviceId: deviceid,
+      qrcodeUrl: qrcodeurl,
+      deviceInfo: deviceinfo,
+      appId: appid,
+      developerId: developerid,
+      fkey: randomStr(20)
+    }).exec();
+  },
+  /**
+   * 根据设备id查设备
+   * @param {*} deviceid 
+   */
+  queryById(deviceid) {
+    return this.findOne({ deviceId: deviceid }).exec();
+  },
+  /**
+   * 检查设备，是不是存在，是不是已经绑定过
+   * @param {*} deviceid 
+   */
+  checkout(deviceid) {
+    return this.findOne({ deviceId: deviceid }).exec()
+      .then(function (device) {
+        if (device) {
+          if (device.openId) {
+            return Promise.reject({ status: 'fail', data: null, msg: '设备已经绑定过' })
+          }
+          return device
+        } else {
+          return Promise.reject({ status: 'fail', data: null, msg: '设备不存在' })
+        }
+      })
+      .catch(e => Promise.reject(e));
+  },
+  /**
+   * 关联用户和设备
+   * @param {*} openid 
+   * @param {*} deviceid 
+   */
+  link(openid, deviceid) {
+    return this.findOneAndUpdate({ deviceId: deviceid }, { openId: openid }).exec();
+  },
+  /**
+   * 检查设备的skey是不是正确
+   * @param {*} deviceid 
+   * @param {*} skey 
+   */
+  checkoutSkey(deviceid, skey) {
+    return this.findOne({ deviceId: deviceid }).exec()
+      .then(function (device) {
+        if (device && device.openId) {
+          if (device.fkey + device.deviceId == skey) {
+            return self.findOneAndUpdate({ deviceId: deviceid }, { fkey: randomStr(20) }, { returnNewDocument: true }).exec();
+          }
+          return Promise.reject({ status: 'fail', data: null, msg: '非法登录' })
+        }
+        return Promise.reject({ status: 'fail', data: null, msg: '设备不存在或未绑定' })
+      })
+      .catch(e => Promise.reject(e));
   }
 };
 
