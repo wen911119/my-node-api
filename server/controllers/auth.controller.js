@@ -1,3 +1,4 @@
+"use strict"
 import jwt from 'jsonwebtoken';
 import httpStatus from 'http-status';
 import APIError from '../helpers/APIError';

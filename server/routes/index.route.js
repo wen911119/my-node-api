@@ -1,3 +1,4 @@
+"use strict"
 import express from 'express';
 import userRoutes from './user.route';
 import authRoutes from './auth.route';

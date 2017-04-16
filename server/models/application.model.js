@@ -1,3 +1,4 @@
+"use strict"
 import Promise from 'bluebird';
 import mongoose from 'mongoose';
 import httpStatus from 'http-status';
@@ -15,14 +16,14 @@ const ApplicationSchema = new mongoose.Schema({
     developerId: {
         type: String,
         required: true,
-        match: [/^J[0-9]+/, '{PATH} ({VALUE}) 不是合法的开发者编号。']
+        match: [/^D[0-9]+/, '{PATH} ({VALUE}) 不是合法的开发者编号。']
     },
     appName: {
         type: String,
         required: true
     },
-    strategy:{
-        type:Object,
+    strategy: {
+        type: Object,
         required: true
     },
     createdAt: {
@@ -48,14 +49,17 @@ ApplicationSchema.method({
  * Statics
  */
 ApplicationSchema.statics = {
-    get({deviceid, appid, developerid}){
-        return this.findOne({appId:appid, developerId:developerid}).exec();
+    get({ deviceid, appid, developerid }) {
+        return this.findOne({ appId: appid, developerId: developerid }).exec();
     },
-    getAppListByDevelopId(developerid){
-        return this.find({developerId:developerid}).exec();        
+    queryByDeveloperId(developerid) {
+        return this.find({ developerId: developerid }).exec();
     },
-    queryByAppId(appid){
-        return this.findOne({appId:appid}).exec();        
+    queryByAppId(appid) {
+        return this.findOne({ appId: appid }).exec();
+    },
+    createNew({ appname, appid, giftcoins, consumetype, developerid }) {
+        return this.create({ appId: appid, appName: appname, developerId: developerid, strategy: { giftCoins: giftcoins, consumeType: consumetype } });
     }
 
 };

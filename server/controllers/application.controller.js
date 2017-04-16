@@ -1,3 +1,4 @@
+"use strict"
 import Application from '../models/application.model'
 import CommonIndex from '../models/commonindex.model';
 import Strategy from '../models/strategy.model';

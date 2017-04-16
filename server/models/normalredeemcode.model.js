@@ -1,3 +1,4 @@
+"use strict"
 import Promise from 'bluebird';
 import mongoose from 'mongoose';
 import httpStatus from 'http-status';
@@ -5,7 +6,7 @@ import APIError from '../helpers/APIError';
 import { randomStr } from '../../utils.js';
 
 /**
- * SuperRedeemCode Schema
+ * NormalRedeemCode Schema
  */
 const NormalRedeemCodeSchema = new mongoose.Schema({
     // 兑换码的值
@@ -50,16 +51,16 @@ const NormalRedeemCodeSchema = new mongoose.Schema({
 /**
  * Methods
  */
-SuperRedeemCodeSchema.method({
+NormalRedeemCodeSchema.method({
 });
 
 /**
  * Statics
  */
-SuperRedeemCodeSchema.statics = {
+NormalRedeemCodeSchema.statics = {
     // 创建一条普通兑换码
-    create({ developerid, denomination, appid }) {
-        return this.create({ createBy: developerid, denomination: denomination, belongTo: appid, value: randomStr(12) });
+    generate(developerid, denomination, appid) {
+        return this.create({ createBy: developerid, denomination: denomination, belongTo: appid, value: randomStr(20) });
     },
     // 使用一条兑换码
     use({ openid, redeemcode }) {
@@ -69,7 +70,7 @@ SuperRedeemCodeSchema.statics = {
             .exec()
             .then(function (data) {
                 if (data && !data.useAt) {
-                    return self.findOneAndUpdate({ value: redeemcode }, { usedBy: openid, useAt: Date.now }, { returnNewDocument: true }).exec()
+                    return self.findOneAndUpdate({ value: redeemcode }, { usedBy: openid, useAt: Date.now }, { new: true }).exec()
                 } else {
                     return Promise.reject({ status: 'fail', data: '', msg: '兑换码无效' })
                 }
@@ -98,6 +99,6 @@ SuperRedeemCodeSchema.statics = {
 
 
 /**
- * @typedef SuperRedeemCode
+ * @typedef NormalRedeemCode
  */
-export default mongoose.model('SuperRedeemCode', SuperRedeemCodeSchema);
+export default mongoose.model('NormalRedeemCode', NormalRedeemCodeSchema);

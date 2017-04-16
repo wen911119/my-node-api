@@ -69,7 +69,7 @@ export default {
       strategy: Joi.string().required()
     }
   },
-
+  //=======================================开发者相关=====================//
   //开发者注册
   developerRegister: {
     body: {
@@ -78,36 +78,66 @@ export default {
       phone: Joi.string().regex(/^1\d{10}/).required()
     }
   },
-  test: {
-    query: {
-      test: Joi.string().required()
-    }
-  },
-  useSuperRedeemCode:{
+  // 开发者登录
+  developerLogin: {
     body: {
-      redeemCode: Joi.string().required()
+      password: Joi.string().required(),
+      email: Joi.string().regex(/^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/).required()
     }
   },
-  genNormalRedeemCode:{
+  // 开发者使用超级兑换码,需要token
+  useSuperRedeemCode: {
     body: {
-      denomination: Joi.number().required()
+      redeemcode: Joi.string().required()
     }
   },
-  useNormalRedeemCode:{
+  genNormalRedeemCode: {
+    body: {
+      denomination: Joi.number().required(),
+      appid: Joi.string().required()
+    }
+  },
+  useNormalRedeemCode: {
     body: {
       openid: Joi.string().required(),
-      redeemcode:Joi.string().required()
+      redeemcode: Joi.string().required()
     }
   },
-  getUserInfo:{
+  getUserInfo: {
     body: {
       openid: Joi.string().required()
     }
   },
 
-  getAllFreshRedeemCodeByAppId:{
+  getAllFreshRedeemCodeByAppId: {
     body: {
-      appid:Joi.string().required()
+      appid: Joi.string().required()
     }
+  },
+  createNewApp: {
+    body: {
+      appname: Joi.string().required(),
+      giftcoins: Joi.number().required(),
+      consumetype: Joi.number().required()
+    }
+  },
+  getAppList: {
+    body: {
+      appid: Joi.string().required()
+    }
+  },
+  getUsersByAppId: {
+    body: {
+      appid: Joi.string().required()
+    }
+  },
+  getUserByAppIdAndUserId: {
+    body: {
+      appid: Joi.string().required(),
+      userid: Joi.string().required()
+    }
+  },
+  test: {
+    body: {}
   }
 };

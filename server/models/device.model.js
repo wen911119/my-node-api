@@ -1,3 +1,4 @@
+"use strict"
 import Promise from 'bluebird';
 import mongoose from 'mongoose';
 import httpStatus from 'http-status';
@@ -78,7 +79,7 @@ DevicesSchema.statics = {
       .then(function (device) {
         if (device && (device.fkey + device.deviceId == mid)) {
           //return self.update({ deviceId: deviceid }, { fkey: randomStr(10) }).exec();
-          return self.findOneAndUpdate({ deviceId: deviceid }, { fkey: '123456' }, { returnNewDocument: true }).exec();
+          return self.findOneAndUpdate({ deviceId: deviceid }, { fkey: '123456' }, { new: true }).exec();
         } else {
           return Promise.reject({ status: 'fail', data: '', msg: '设备没有注册或者非法授权' });
         }
@@ -149,7 +150,7 @@ DevicesSchema.statics = {
       .then(function (device) {
         if (device && device.openId) {
           if (device.fkey + device.deviceId == skey) {
-            return self.findOneAndUpdate({ deviceId: deviceid }, { fkey: randomStr(20) }, { returnNewDocument: true }).exec();
+            return self.findOneAndUpdate({ deviceId: deviceid }, { fkey: randomStr(20) }, { new: true }).exec();
           }
           return Promise.reject({ status: 'fail', data: null, msg: '非法登录' })
         }

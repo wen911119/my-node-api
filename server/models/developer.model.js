@@ -1,3 +1,4 @@
+"use strict"
 import Promise from 'bluebird';
 import mongoose from 'mongoose';
 import httpStatus from 'http-status';
@@ -10,7 +11,7 @@ const DeveloperSchema = new mongoose.Schema({
     developerId: {
         type: String,
         required: true,
-        match: [/^J[0-9]+/, '{PATH} ({VALUE}) 不是合法的开发者编号。']
+        match: [/^D[0-9]+/, '{PATH} ({VALUE}) 不是合法的开发者编号。']
     },
     password: {
         type: String,
@@ -29,8 +30,8 @@ const DeveloperSchema = new mongoose.Schema({
         type: Number,
         default: 0
     },
-    active:{
-        type:Boolean,
+    active: {
+        type: Boolean,
         default: false
     },
     createdAt: {
@@ -56,19 +57,22 @@ DeveloperSchema.method({
  */
 DeveloperSchema.statics = {
     createNewDeveloper({ developerid, password, email, phone }) {
-        return this.create({ developerId: developerid, password: password, email: email, phone: phone }).exec();
+        return this.create({ developerId: developerid, password: password, email: email, phone: phone });
     },
-    queryByEmail({email}){
-        return this.findOne({email: email}).exec();
+    queryByEmail({ email }) {
+        return this.findOne({ email: email }).exec();
     },
-    checkDeveloper({email, password}){
-        return this.findOne({email: email, password: password}).exec();        
+    checkDeveloper({ email, password }) {
+        return this.findOne({ email: email, password: password }).exec();
     },
-    addCoin({developerid, denomination}){
-        return this.findOneAndUpdate({ developerId: developerid }, { $inc:{coins: denomination} }, {returnNewDocument:true}).exec();
+    addCoin({ developerid, denomination }) {
+        return this.findOneAndUpdate({ developerId: developerid }, { $inc: { coins: denomination } }, { new: true }).exec();
     },
-    reduceCoin({developerid, denomination}){
-        return this.findOneAndUpdate({ developerId: developerid }, { $inc:{coins: -denomination} }, {returnNewDocument:true}).exec();
+    reduceCoin({ developerid, denomination }) {
+        return this.findOneAndUpdate({ developerId: developerid }, { $inc: { coins: -denomination } }, { new: true }).exec();
+    },
+    queryByDeveloperId(developerid) {
+        return this.findOne({ developerId: developerid}).exec();
     }
 };
 

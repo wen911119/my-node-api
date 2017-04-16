@@ -1,3 +1,4 @@
+"use strict"
 import Promise from 'bluebird';
 import mongoose from 'mongoose';
 import httpStatus from 'http-status';
@@ -15,7 +16,8 @@ const SuperRedeemCodeSchema = new mongoose.Schema({
 
     // 面额
     denomination: {
-        type: Number
+        type: Number,
+        required: true
     },
     // 使用者的开发者id
     usedBy: {
@@ -48,20 +50,23 @@ SuperRedeemCodeSchema.method({
  * Statics
  */
 SuperRedeemCodeSchema.statics = {
-
-    use({ developerid, redeemcode }) {
-        // 先看下兑换码是不是存在并且没有用过
-        let self = this;
-        this.findOne({value:redeemcode})
-            .exec()
-            .then(function(data){
-                if(data && !data.useAt){
-                    return self.findOneAndUpdate({value:redeemcode},{usedBy:developerid, useAt:Date.now}, {returnNewDocument:true}).exec()
-                }else{
-                    return Promise.reject({ status: 'fail', data: '', msg: '兑换码无效' })                                                
-                }
-            })
-            .catch(e=>Promise.reject(e));  
+    // 消费兑换码
+    consume({ developerid, redeemcode }) {
+        return this.findOneAndUpdate({ value: redeemcode }, { usedBy: developerid, useAt: Date.now() }, { new: true }).exec();
+    },
+    // 检查兑换码是否存在
+    async check({ redeemcode }) {
+        let data = await this.findOne({ value: redeemcode }).exec();
+        if (data) {
+            if (data.usedBy) {
+                // 被用过了
+                return { status: 'fail', data: null, msg: '兑换码已经被用过了' }
+            } else {
+                return { status: 'ok', data: data, msg: '兑换码合法' }
+            }
+        } else {
+            return { status: 'fail', data: null, msg: '兑换码不存在' }
+        }
     }
 };
 

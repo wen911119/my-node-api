@@ -105,26 +105,42 @@ function register2(req, res, next) {
 async function bind2(req, res, next) {
     const { openid, deviceid } = req.body;
     // 同时查用户信息和设备信息，都返回了再相机处理  
-    Promise.all([Device.checkout(deviceid), User.checkout(openid)])
-        .then(function (values) {
-            let user;
-            if (values[1].apps.some(item => item.appId == values[0].appId)) {
-                // 用户已经有这个应用，只需要增加下这个应用下的设备数目
-                user = await User.addDeviceToApp(openid, values[0].appId)
-            } else {
-                // 用户第一次添加这个应用,还要去查这个应用的优惠政策
-                const appinfo = await Application.queryByAppId(values[0].appId)
-                user = await User.addApp(openid, values[0].appId, appinfo.strategy.giftCoins)
-            }
-            // 最后关联用户和设备
-            const bind_result = await Device.link(openid, deviceid);
-            res.json({
-                status: 'ok',
-                data: bind_result,
-                msg: '绑定成功'
-            })
-        })
-        .catch(e => res.json(e));
+    let [checkout_device_res, checkout_user_res] = await Promise.all([Device.checkout(deviceid), User.checkout(openid)]);
+    let user;
+    if (checkout_user_res.apps.some(item => item.appId == checkout_device_res.appId)) {
+        // 用户已经有这个应用，只需要增加下这个应用下的设备数目
+        user = await User.addDeviceToApp(openid, checkout_device_res.appId)
+    } else {
+        // 用户第一次添加这个应用,还要去查这个应用的优惠政策
+        const appinfo = await Application.queryByAppId(checkout_device_res.appId)
+        user = await User.addApp(openid, checkout_device_res.appId, appinfo.strategy.giftCoins)
+    }
+    // 最后关联用户和设备
+    const bind_result = await Device.link(openid, deviceid);
+    // 返回结果
+    res.json({ status: 'ok', data: bind_result, msg: '绑定成功' });
+
+
+    // Promise.all([Device.checkout(deviceid), User.checkout(openid)])
+    //     .then(function (values) {
+    //         let user;
+    //         if (values[1].apps.some(item => item.appId == values[0].appId)) {
+    //             // 用户已经有这个应用，只需要增加下这个应用下的设备数目
+    //             user = await User.addDeviceToApp(openid, values[0].appId)
+    //         } else {
+    //             // 用户第一次添加这个应用,还要去查这个应用的优惠政策
+    //             const appinfo = await Application.queryByAppId(values[0].appId)
+    //             user = await User.addApp(openid, values[0].appId, appinfo.strategy.giftCoins)
+    //         }
+    //         // 最后关联用户和设备
+    //         const bind_result = await Device.link(openid, deviceid);
+    //         res.json({
+    //             status: 'ok',
+    //             data: bind_result,
+    //             msg: '绑定成功'
+    //         })
+    //     })
+    //     .catch(e => res.json(e));
 }
 
 async function login(req, res, next) {
@@ -134,13 +150,13 @@ async function login(req, res, next) {
         const deviceinfo = await Device.checkoutSkey(deviceid, skey)
         // 还要检查该设备所有人的账户是不是欠费
         const user = await User.queryByOpenIdAndAppId(deviceinfo.openId, deviceinfo.appId)
-        if (user.apps[0].coins>0) {
+        if (user.apps[0].coins > 0) {
             res.json({
                 status: 'ok',
                 data: deviceinfo.fkey,
                 msg: '登录成功'
             })
-        }else{
+        } else {
             res.json({
                 status: 'fail',
                 data: deviceinfo.fkey,

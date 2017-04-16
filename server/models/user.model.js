@@ -1,3 +1,4 @@
+"use strict"
 import Promise from 'bluebird';
 import mongoose from 'mongoose';
 import httpStatus from 'http-status';
@@ -101,11 +102,11 @@ UserSchema.statics = {
 
   // 给用户添加一个应用
   addApp(openid, appid, giftCoins) {
-    return this.findOneAndUpdate({ openId: openid }, { $addToSet: { apps: { appId: appid, coins: giftCoins, devicesNum: 1 } } }, { returnNewDocument: true }).exec();
+    return this.findOneAndUpdate({ openId: openid }, { $addToSet: { apps: { appId: appid, coins: giftCoins, devicesNum: 1 } } }, { new: true }).exec();
   },
   // 给用户一个已经存在的应用增加一个设备
   addDeviceToApp(opened, appid) {
-    return this.findOneAndUpdate({ openId: openid, apps: { $elemMatch: { appId: appid } } }, { $inc: { "apps.$.devicesNum": 1 } }, { returnNewDocument: true }).exec();
+    return this.findOneAndUpdate({ openId: openid, apps: { $elemMatch: { appId: appid } } }, { $inc: { "apps.$.devicesNum": 1 } }, { new: true }).exec();
   },
 
   checkCoin({ openId, fkey, appId }) {
@@ -128,18 +129,18 @@ UserSchema.statics = {
   },
 
   addCoin({ openid, appid, coinNum }) {
-    return this.update({ openId: openid, apps: { $elemMatch: { appId: appid } } }, { $inc: { "appa.$.coins": coinNum } }, { returnNewDocument: true }).exec();
+    return this.update({ openId: openid, apps: { $elemMatch: { appId: appid } } }, { $inc: { "appa.$.coins": coinNum } }, { new: true }).exec();
   },
   /**
-   * 根据appid查用户
+   * 根据appid和developerid查用户
    * @param {*} appid 
    */
-  queryByAppId(appid) {
-    return this.find({ apps: { $elemMatch: { appId: appid } } }).exec();
+  queryByAppIdAndDeveloperId(appid, developerid) {
+    return this.find({ apps: { $elemMatch: { appId: appid, developerId: developerid } } }, { "apps.$": 1 }).exec();
   },
 
-  queryByOpenIdAndAppId(openid, appid) {
-    return this.findOne({ openId: openId, apps: { $elemMatch: { appId: appid } } }, { "apps.$": 1 }).exec();
+  queryByOpenIdAndAppId(openid, appid, developerid) {
+    return this.find({ openId: openid, apps: { $elemMatch: { appId: appid, developerId: developerid } } }, { "apps.$": 1 }).exec();
   }
 
 

@@ -1,3 +1,4 @@
+"use strict"
 import User from '../models/user.model';
 import NormalRedeemCode from '../models/normalredeemcode.model';
 
@@ -66,4 +67,4 @@ function getUserInfo(req, res, next) {
     .catch(e=>res.json(e));
 }
 
-export default { create, useNormalRedeemCode };
+export default { create, useNormalRedeemCode, getUserInfo };
