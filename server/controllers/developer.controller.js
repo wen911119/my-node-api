@@ -16,6 +16,7 @@ import Application from '../models/application.model';
 
 /**
  * 开发者注册
+ * tested
  * @param {*} req 
  * @param {*} res 
  * @param {*} next 
@@ -43,6 +44,7 @@ async function register(req, res, next) {
 
 /**
  * 开发者登陆
+ * tested
  * @param {*} req 
  * @param {*} res 
  * @param {*} next 
@@ -67,6 +69,7 @@ async function login(req, res, next) {
 /**
  * 获取开发者详细信息
  * 需要token
+ * tested
  * @param {*} req 
  * @param {*} res 
  * @param {*} next 
@@ -84,6 +87,8 @@ async function getDeveloperInfo(req, res, next) {
 
 /**
  * 开发者使用超级兑换码给自己充值
+ * 需要token
+ * tested
  * @param {*} req 
  * @param {*} res 
  * @param {*} next 
@@ -111,6 +116,8 @@ async function useSuperRedeemCode(req, res, next) {
 
 /**
  * 开发者生成普通兑换码
+ * 需要token
+ * tested
  * @param {*} req 
  * @param {*} res 
  * @param {*} next 
@@ -143,6 +150,8 @@ async function genNormalRedeemCode(req, res, next) {
 
 /**
  * 开发者查询自己创建出来的还没有被使用过的兑换码
+ * 需要token
+ * tested
  * @param {*} req 
  * @param {*} res 
  * @param {*} next 
@@ -158,6 +167,8 @@ async function getAllFreshRedeemCodeByAppId(req, res, next) {
 }
 /**
  * 开发者新建一个app
+ * 需要token
+ * tested
  * @param {*} req 
  * @param {*} res 
  * @param {*} next 
@@ -179,6 +190,8 @@ async function createNewApp(req, res, next) {
 
 /**
  * 开发者查询出自己名下的所有app
+ * 需要token
+ * tested
  * @param {*} req 
  * @param {*} res 
  * @param {*} next 
@@ -198,6 +211,7 @@ async function getAppList(req, res, next) {
 /**
  * 开发者查询出自己某个应用下的所有用户
  * 需要token
+ * tested
  * @param {*} req 
  * @param {*} res 
  * @param {*} next 
@@ -216,6 +230,7 @@ async function getUsersByAppId(req, res, next) {
 /**
  * 开发者查询自己某个应用下的某个用户
  * 需要token
+ * tested
  * @param {*} req 
  * @param {*} res 
  * @param {*} next 
