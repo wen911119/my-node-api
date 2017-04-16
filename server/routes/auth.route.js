@@ -17,8 +17,6 @@ router.route('/login')
 router.route('/random-number')
   .get(validate(paramValidation.test),expressJwt({ secret: config.jwtSecret }), authCtrl.getRandomNumber);
 
-router.route('/device-login')
-  .post(validate(paramValidation.deviceloginWithoutOpenId), authCtrl.deviceloginWithoutOpenId);
 
 
 export default router;

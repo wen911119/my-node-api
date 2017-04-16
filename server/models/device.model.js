@@ -153,6 +153,14 @@ DevicesSchema.statics = {
       return { status: 'fail', data: null, msg: '非法登录' }
     }
     return { status: 'fail', data: null, msg: '设备不存在或未绑定' }
+  },
+
+  queryByAppIdAndOpenId(appid, openid){
+    return this.find().exec({appId: appid, openId: openid});
+  },
+
+  unbundling({deviceid, openid, appid}){
+    return this.findOneAndRemove({deviceId: deviceid, openId: openid, appId: appid}).exec();
   }
 };
 

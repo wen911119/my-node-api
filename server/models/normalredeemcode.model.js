@@ -63,31 +63,17 @@ NormalRedeemCodeSchema.statics = {
         return this.create({ createBy: developerid, denomination: denomination, belongTo: appid, value: randomStr(20) });
     },
     // 使用一条兑换码
-    use({ openid, redeemcode }) {
-        // 先看下兑换码是不是存在并且没有用过
-        let self = this;
-        this.findOne({ value: redeemcode })
-            .exec()
-            .then(function (data) {
-                if (data && !data.useAt) {
-                    return self.findOneAndUpdate({ value: redeemcode }, { usedBy: openid, useAt: Date.now }, { new: true }).exec()
-                } else {
-                    return Promise.reject({ status: 'fail', data: '', msg: '兑换码无效' })
-                }
-            })
-            .catch(e => Promise.reject(e));
+    consume({ openid, redeemcode }) {
+        return this.findOneAndUpdate({ value: redeemcode }, { usedBy: openid, useAt: Date.now() }, { new: true }).exec()
     },
     // 检查一条兑换码是否有效，包括是否存在和是否使用过
-    check(redeemcode) {
-        return this.findOne({ value: redeemcode }).exec()
-            .then(function (code) {
-                if (code && !code.useAt) {
-                    return code
-                } else {
-                    return Promise.reject({ status: 'fail', data: '', msg: '兑换码无效' })
-                }
-            })
-            .catch(e => Promise.reject(e));
+    async check(redeemcode) {
+        let code = await this.findOne({ value: redeemcode }).exec();
+        if (code && !code.useAt) {
+            return { status: 'ok', data: code, msg: '兑换码有效' }
+        } else {
+            return { status: 'fail', data: '', msg: '兑换码无效' }
+        }
     },
 
     // 查询出某个开发者创建的，还没有使用过的兑换码

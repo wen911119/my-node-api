@@ -55,20 +55,8 @@ async function login(req, res, next) {
         if (deviceinfo.status == 'ok') {
             // 设备检查通过
             // 还要检查该设备所有人的账户是不是欠费
-            const user = await User.queryByOpenIdAndAppId(deviceinfo.data.openId, deviceinfo.data.appId)
-            if (user.apps[0].coins > 0) {
-                res.json({
-                    status: 'ok',
-                    data: deviceinfo.data.fkey,
-                    msg: '登录成功'
-                })
-            } else {
-                res.json({
-                    status: 'fail',
-                    data: deviceinfo.data.fkey,
-                    msg: '余额不足，请充值！'
-                })
-            }
+            const user_check_res = await User.loginCheck(deviceinfo.data.openId, deviceinfo.data.fkey, deviceinfo.data.appId)
+            res.json(user_check_res);
         } else {
             res.json(deviceinfo);
         }

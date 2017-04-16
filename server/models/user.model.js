@@ -51,54 +51,19 @@ UserSchema.method({
  * Statics
  */
 UserSchema.statics = {
+
   /**
-   * Get user
-   * @param {ObjectId} id - The objectId of user.
-   * @returns {Promise<User, APIError>}
+   * 检查用户是否存在，不存在则新建一个并返回
+   * @param {*} openid 
    */
-  get({ openid }) {
-    return this.findOne({ openId: openid }).exec();
+  async checkout(openid) {
+    let user = await this.findOne({ openId: openid }).exec()
+    if (user) {
+      return user
+    }
+    return this.create({ openId: openid, apps:[] });
   },
 
-  checkout(openid) {
-    return this.findOne({ openId: openid }).exec()
-      .then(function (user) {
-        if (user) {
-          return user
-        }
-        return this.create({ openId: openid }).exec();
-      })
-      .catch(e => Promise.reject(e));
-  },
-
-  /**新增或者更新user */
-  createOrUpdate(openid, appid, deviceid, developid) {
-    return this.update({ openId: openid }, { $push: { devices: { deviceId: deviceid } } }, { upsert: true }).exec();
-  },
-
-
-  addApp(appid) {
-    let self = this;
-    return self.findOne({ openId: data.openId }).exec().then(function (user) {
-      if (user) {
-        // 用户存在
-        // 还要判断应用存不存在
-        if (user.apps && user.apps.some(item => item.appId == data.appId)) {
-          // 应用已经存在了，只要更新下该应用的devicesNum
-          return self.update({ openId: data.openId, apps: { $elemMatch: { appId: data.appId } } }, { $inc: { "apps.$.devicesNum": 1 } }).exec()
-
-        } else {
-          // 应用不存在
-          return self.update({ openId: data.openId }, { $addToSet: { apps: { appId: data.appId, coins: appInfo.strategy.giftCoins, devicesNum: 1 } } }).exec()
-        }
-      } else {
-        // 用户不存在
-        // 要创建一个用户
-        // 但同时也给用户添加了一个app,这个app的总送点卡数需要先查出来
-        return self.create({ openId: data.openId, apps: [{ appId: data.appId, coins: appInfo.strategy.giftCoins, devicesNum: 1 }] })
-      }
-    });
-  },
 
   // 给用户添加一个应用
   addApp(openid, appid, giftCoins) {
@@ -108,28 +73,33 @@ UserSchema.statics = {
   addDeviceToApp(opened, appid) {
     return this.findOneAndUpdate({ openId: openid, apps: { $elemMatch: { appId: appid } } }, { $inc: { "apps.$.devicesNum": 1 } }, { new: true }).exec();
   },
-
-  checkCoin({ openId, fkey, appId }) {
-    return this.findOne({ openId: openId, apps: { $elemMatch: { appId: appId } } }, { "apps.$": 1 }).exec()
-      .then(function (user) {
-        if (user) {
-          if (user.apps[0].coins > 0) {
-            return { status: 'ok', data: fkey, msg: '登录成功' }
-          } else {
-            return Promise.reject({ status: 'fail', data: fkey, msg: '余额不足，请充值！' })
-          }
-        } else {
-          return Promise.reject({ status: 'fail', data: '', msg: '该微信用户未找到' });
-        }
-      })
-      .catch(e => {
-        console.log(e);
-        return Promise.reject(e);
-      });
+  // 设备登录时对所属用户的检查
+  async loginCheck(openId, fkey, appId) {
+    let user = await this.findOne({ openId: openId, apps: { $elemMatch: { appId: appId } } }, { "apps.$": 1 }).exec()
+    if (user) {
+      if (user.apps[0].coins > 0) {
+        return { status: 'ok', data: fkey, msg: '登录成功' }
+      } else {
+        return { status: 'fail', data: fkey, msg: '余额不足，请充值！' }
+      }
+    } else {
+      return { status: 'fail', data: '', msg: '该微信用户未找到' }
+    }
   },
 
-  addCoin({ openid, appid, coinNum }) {
-    return this.update({ openId: openid, apps: { $elemMatch: { appId: appid } } }, { $inc: { "appa.$.coins": coinNum } }, { new: true }).exec();
+  async addCoin({ openid, appid, coinNum, developerid }) {
+    // 先判断这个用户是不是存在，以防用户先充值再绑定
+    let user = await this.findOne({ openId: openid }).exec();
+    if (user && user.apps.some(item => item.appId == appid)) {
+      // 用户存在并且应用存在
+      return this.findOneAndUpdate({ openId: openid, apps: { $elemMatch: { appId: appid } } }, { $inc: { "appa.$.coins": coinNum } }, { new: true }).exec();
+    } else if (user) {
+      // 用户存在但是应用不存在
+      return this.findOneAndUpdate({ openId: openid }, { $addToSet: { apps: { appId: appid, coins: coinNum, devicesNum: 0, developerId: developerid } } }, { new: true }).exec();
+    } else {
+      // 用户不存在
+      return this.create({ appId: appid, apps: [{ appId: appid, coins: coinNum, devicesNum: 0, developerId: developerid }] });
+    }
   },
   /**
    * 根据appid和developerid查用户

@@ -28,7 +28,7 @@ export default {
     }
   },
 
-  deviceloginWithoutOpenId: {
+  deviceLogin: {
     body: {
       deviceid: Joi.string().regex(/^D[0-9]+$/).required(),
       appid: Joi.string().regex(/^A[0-9]+$/).required(),
@@ -107,7 +107,19 @@ export default {
       openid: Joi.string().required()
     }
   },
-
+  getDevicesListByAppIdAndUserId:{
+    body:{
+      appid:Joi.string().required(),
+      userid: Joi.string().required()
+    }
+  },
+  unbundlingDevice:{
+    body:{
+      deviceid:Joi.string().required(),
+      openid:Joi.string().required(),
+      appid:Joi.string().required()
+    }
+  },
   getAllFreshRedeemCodeByAppId: {
     body: {
       appid: Joi.string().required()

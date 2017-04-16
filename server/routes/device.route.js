@@ -10,8 +10,8 @@ router.route('/register')
     
     .post(validate(paramValidation.deviceRegister), deviceCtrl.register);
 
-router.route('/bind')
-    .post(validate(paramValidation.deviceBind), deviceCtrl.bind);
+router.route('/login')
+    .post(validate(paramValidation.deviceLogin), deviceCtrl.login);
 
 // router.route('/:userId')
 //   /** GET /api/users/:userId - Get user */
