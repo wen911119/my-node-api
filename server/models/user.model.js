@@ -140,7 +140,7 @@ UserSchema.statics = {
   },
 
   queryByOpenIdAndAppId(openid, appid, developerid) {
-    return this.find({ openId: openid, apps: { $elemMatch: { appId: appid, developerId: developerid } } }, { "apps.$": 1 }).exec();
+    return this.find({ openId: openid, apps: { $elemMatch: { appId: appid } } }, { "apps.$": 1 }).exec();
   }
 
 

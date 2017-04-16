@@ -118,19 +118,16 @@ DevicesSchema.statics = {
    * 检查设备，是不是存在，是不是已经绑定过
    * @param {*} deviceid 
    */
-  checkout(deviceid) {
-    return this.findOne({ deviceId: deviceid }).exec()
-      .then(function (device) {
-        if (device) {
-          if (device.openId) {
-            return Promise.reject({ status: 'fail', data: null, msg: '设备已经绑定过' })
-          }
-          return device
-        } else {
-          return Promise.reject({ status: 'fail', data: null, msg: '设备不存在' })
-        }
-      })
-      .catch(e => Promise.reject(e));
+  async checkout(deviceid) {
+    let device = await this.findOne({ deviceId: deviceid }).exec();
+    if (device) {
+      if (device.openId) {
+        return { status: 'fail', data: null, msg: '设备已经绑定过' }
+      }
+      return { status: 'ok', data: device, msg: '设备ok' }
+    } else {
+      return { status: 'fail', data: null, msg: '设备不存在' }
+    }
   },
   /**
    * 关联用户和设备
@@ -141,22 +138,21 @@ DevicesSchema.statics = {
     return this.findOneAndUpdate({ deviceId: deviceid }, { openId: openid }).exec();
   },
   /**
-   * 检查设备的skey是不是正确
+   * 设备登录时做的一些检查
    * @param {*} deviceid 
    * @param {*} skey 
    */
-  checkoutSkey(deviceid, skey) {
-    return this.findOne({ deviceId: deviceid }).exec()
-      .then(function (device) {
-        if (device && device.openId) {
-          if (device.fkey + device.deviceId == skey) {
-            return self.findOneAndUpdate({ deviceId: deviceid }, { fkey: randomStr(20) }, { new: true }).exec();
-          }
-          return Promise.reject({ status: 'fail', data: null, msg: '非法登录' })
-        }
-        return Promise.reject({ status: 'fail', data: null, msg: '设备不存在或未绑定' })
-      })
-      .catch(e => Promise.reject(e));
+  async loginCheck(deviceid, skey) {
+    let device = await this.findOne({ deviceId: deviceid }).exec();
+    if (device && device.openId) {
+      if (device.fkey + device.deviceId == skey) {
+        // 设备合法，还要更新skey
+        let _device = await this.findOneAndUpdate({ deviceId: deviceid }, { fkey: randomStr(20) }, { new: true }).exec();
+        return { status: 'ok', data: _device, msg: '设备合法' }
+      }
+      return { status: 'fail', data: null, msg: '非法登录' }
+    }
+    return { status: 'fail', data: null, msg: '设备不存在或未绑定' }
   }
 };
 

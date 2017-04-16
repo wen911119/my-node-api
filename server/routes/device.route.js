@@ -7,14 +7,11 @@ import deviceCtrl from '../controllers/device.controller';
 const router = express.Router(); // eslint-disable-line new-cap
 
 router.route('/register')
-    /** GET /api/users - Get list of users */
-    //   .get(userCtrl.list)
-
-    /** POST /api/users - Create new user */
-    .post(validate(paramValidation.registerDevice), deviceCtrl.register);
+    
+    .post(validate(paramValidation.deviceRegister), deviceCtrl.register);
 
 router.route('/bind')
-    .post(validate(paramValidation.bindDevice), deviceCtrl.bind);
+    .post(validate(paramValidation.deviceBind), deviceCtrl.bind);
 
 // router.route('/:userId')
 //   /** GET /api/users/:userId - Get user */

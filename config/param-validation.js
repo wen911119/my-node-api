@@ -46,20 +46,19 @@ export default {
       openid: Joi.string().hex().required()
     }
   },
-
-  bindDevice: {
+  // 用户扫二维码绑定设备
+  deviceBind: {
     body: {
       deviceid: Joi.string().required(),
-      openid: Joi.string().required(),
-      appid: Joi.string().required(),
-      developerid: Joi.string().required()
+      openid: Joi.string().required()
     }
   },
   // 注册一台新设备
-  registerDevice: {
+  deviceRegister: {
     body: {
       appid: Joi.string().required(),
-      developerid: Joi.string().required()
+      developerid: Joi.string().required(),
+      deviceinfo:Joi.string().required()
     }
   },
   // 创建新应用
