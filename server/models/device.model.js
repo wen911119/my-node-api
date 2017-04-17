@@ -97,15 +97,17 @@ DevicesSchema.statics = {
    * @param {*} deviceinfo 
    * @param {*} qrcodeurl 
    */
-  addBareDevice(deviceid, developerid, appid, deviceinfo, qrcodeurl) {
-    return this.create({
+  async addBareDevice(deviceid, developerid, appid, deviceinfo, qrcodeurl) {
+    let new_device = {
       deviceId: deviceid,
       qrcodeUrl: qrcodeurl,
       deviceInfo: deviceinfo,
       appId: appid,
       developerId: developerid,
       fkey: randomStr(20)
-    }).exec();
+    }
+    let result = await this.create(new_device);
+    return new_device
   },
   /**
    * 根据设备id查设备
@@ -155,12 +157,12 @@ DevicesSchema.statics = {
     return { status: 'fail', data: null, msg: '设备不存在或未绑定' }
   },
 
-  queryByAppIdAndOpenId(appid, openid){
-    return this.find().exec({appId: appid, openId: openid});
+  queryByAppIdAndOpenId(appid, openid) {
+    return this.find().exec({ appId: appid, openId: openid });
   },
 
-  unbundling({deviceid, openid, appid}){
-    return this.findOneAndRemove({deviceId: deviceid, openId: openid, appId: appid}).exec();
+  unbundling({ deviceid, openid, appid }) {
+    return this.findOneAndRemove({ deviceId: deviceid, openId: openid, appId: appid }).exec();
   }
 };
 
