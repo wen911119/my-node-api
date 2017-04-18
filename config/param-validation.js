@@ -20,6 +20,12 @@ export default {
     }
   },
 
+  bindDevice:{
+    body:{
+      openid:Joi.string().required(),
+      deviceid:Joi.string().required()
+    }
+  },
   // POST /api/auth/login
   login: {
     body: {
@@ -30,9 +36,10 @@ export default {
 
   deviceLogin: {
     body: {
-      deviceid: Joi.string().regex(/^D[0-9]+$/).required(),
-      appid: Joi.string().regex(/^A[0-9]+$/).required(),
-      developerid: Joi.string().required()
+      deviceid: Joi.string().regex(/^E[0-9]+$/).required(),
+      //appid: Joi.string().regex(/^A[0-9]+$/).required(),
+      //developerid: Joi.string().required(),
+      skey:Joi.string().required()
     }
   },
 

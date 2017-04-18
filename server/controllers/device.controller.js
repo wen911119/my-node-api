@@ -9,6 +9,7 @@ var fetch = require('node-fetch');
 let device_index = 0;
 /**
  * 新建一个设备记录
+ * tested
  * @param {*} req 
  * @param {*} res 
  * @param {*} next 
@@ -28,8 +29,17 @@ async function register(req, res, next) {
             } catch (e) {
                 console.log(e)
             }
-            let new_device = await Device.addBareDevice(deviceid, req.body.developerid, req.body.appid, deviceinfo, qrcode_url)
-            res.json({ status: 'ok', data: new_device, msg: '设备注册成功' });
+            let new_bare_device = new Device({
+                deviceId: deviceid,
+                qrcodeUrl: qrcode_url,
+                deviceInfo: deviceinfo,
+                appId: req.body.appid,
+                developerId: req.body.developerid,
+                fkey: randomStr(20)
+            });
+            new_bare_device = await new_bare_device.save();
+            //let new_device = await Device.addBareDevice(deviceid, req.body.developerid, req.body.appid, deviceinfo, qrcode_url)
+            res.json({ status: 'ok', data: new_bare_device, msg: '设备注册成功' });
         } else {
             // 没拿到二维码
             res.json({ status: 'fail', data: null, msg: '获取二维码失败' });

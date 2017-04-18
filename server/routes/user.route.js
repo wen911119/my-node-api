@@ -7,6 +7,9 @@ import userCtrl from '../controllers/user.controller';
 const router = express.Router(); // eslint-disable-line new-cap
 
 
+router.route('/bind')
+ 
+  .post(validate(paramValidation.bindDevice), userCtrl.bind);
 
 
 router.route('/useNormalRedeemCode')

@@ -2,6 +2,7 @@
 import User from '../models/user.model';
 import NormalRedeemCode from '../models/normalredeemcode.model';
 import Device from '../models/device.model'
+import Application from '../models/application.model';
 
 
 

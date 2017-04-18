@@ -12,7 +12,7 @@ const DevicesSchema = new mongoose.Schema({
   deviceId: {
     type: String,
     required: true,
-    match: [/^D[0-9]+/, '{PATH} ({VALUE}) 不是合法的设备编号。']
+    match: [/^E[0-9]+/, '{PATH} ({VALUE}) 不是合法的设备编号。']
   },
   openId: {
     type: String,
@@ -27,11 +27,11 @@ const DevicesSchema = new mongoose.Schema({
   },
   appId: {
     type: String,
-    match: [/^G[0-9]+/, '{PATH} ({VALUE}) 不是合法的游戏编号。']
+    match: [/A[0-9]+/, '{PATH} ({VALUE}) 不是合法的游戏编号。']
   },
   developerId: {
     type: String,
-    match: [/^J[0-9]+/, '{PATH} ({VALUE}) 不是合法的脚本作者编号。']
+    match: [/^D[0-9]+/, '{PATH} ({VALUE}) 不是合法的脚本作者编号。']
   },
   fkey: {
     type: String,
@@ -97,17 +97,30 @@ DevicesSchema.statics = {
    * @param {*} deviceinfo 
    * @param {*} qrcodeurl 
    */
-  async addBareDevice(deviceid, developerid, appid, deviceinfo, qrcodeurl) {
-    let new_device = {
+  addBareDevice(deviceid, developerid, appid, deviceinfo, qrcodeurl) {
+    // let new_device = {
+    //   deviceId: deviceid,
+    //   qrcodeUrl: qrcodeurl,
+    //   deviceInfo: deviceinfo,
+    //   appId: appid,
+    //   developerId: developerid,
+    //   fkey: randomStr(20)
+    // }
+    // try{
+      
+    // var result = await this.create(new_device);
+    // }catch(e){
+    //   console.log(e, 77777777);
+    // }
+    return this.create({
       deviceId: deviceid,
       qrcodeUrl: qrcodeurl,
       deviceInfo: deviceinfo,
       appId: appid,
       developerId: developerid,
       fkey: randomStr(20)
-    }
-    let result = await this.create(new_device);
-    return new_device
+    }).exec();
+
   },
   /**
    * 根据设备id查设备
