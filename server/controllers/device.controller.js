@@ -56,7 +56,7 @@ async function register(req, res, next) {
  * @param {*} req 
  * @param {*} res 
  * @param {*} next 
- */
+ */tested
 async function login(req, res, next) {
     const { deviceid, skey } = req.body;
     try {
