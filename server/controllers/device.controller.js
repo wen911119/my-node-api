@@ -53,10 +53,11 @@ async function register(req, res, next) {
 
 /**
  * 设备登录
+ * tested
  * @param {*} req 
  * @param {*} res 
  * @param {*} next 
- */tested
+ */
 async function login(req, res, next) {
     const { deviceid, skey } = req.body;
     try {
@@ -65,7 +66,7 @@ async function login(req, res, next) {
         if (deviceinfo.status == 'ok') {
             // 设备检查通过
             // 还要检查该设备所有人的账户是不是欠费
-            const user_check_res = await User.loginCheck(deviceinfo.data.openId, deviceinfo.data.fkey, deviceinfo.data.appId)
+            const user_check_res = await User.loginCheck(deviceinfo.data.openId, deviceinfo.data.fkey, deviceinfo.data.appId, deviceinfo.needPay)
             res.json(user_check_res);
         } else {
             res.json(deviceinfo);

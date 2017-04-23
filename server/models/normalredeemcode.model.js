@@ -63,7 +63,7 @@ NormalRedeemCodeSchema.statics = {
         return this.create({ createBy: developerid, denomination: denomination, belongTo: appid, value: randomStr(20) });
     },
     // 使用一条兑换码
-    consume({ openid, redeemcode }) {
+    consume(openid, redeemcode) {
         return this.findOneAndUpdate({ value: redeemcode }, { usedBy: openid, useAt: Date.now() }, { new: true }).exec()
     },
     // 检查一条兑换码是否有效，包括是否存在和是否使用过

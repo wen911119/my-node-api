@@ -21,17 +21,14 @@ router.route('/getUserInfo')
  
   .post(validate(paramValidation.getUserInfo), userCtrl.getUserInfo);
 
-// router.route('/:userId')
-//   /** GET /api/users/:userId - Get user */
-//   .get(userCtrl.get)
 
-//   /** PUT /api/users/:userId - Update user */
-//   .put(validate(paramValidation.updateUser), userCtrl.update)
+router.route('/getDevicesListByAppIdAndUserId')
+ 
+  .post(validate(paramValidation.getDevicesListByAppIdAndUserId), userCtrl.getDevicesListByAppIdAndUserId);
 
-//   /** DELETE /api/users/:userId - Delete user */
-//   .delete(userCtrl.remove);
+router.route('/unbundlingDevice')
+ 
+  .post(validate(paramValidation.unbundlingDevice), userCtrl.unbundlingDevice);
 
-/** Load user when API with userId route parameter is hit */
-//router.param('userId', userCtrl.load);
 
 export default router;

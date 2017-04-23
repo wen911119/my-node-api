@@ -9,6 +9,7 @@ import Application from '../models/application.model';
 /**
  * 设备绑定
  * 微信扫码发起
+ * tested
  * @param {*} req 
  * @param {*} res 
  * @param {*} next 
@@ -26,7 +27,7 @@ async function bind(req, res, next) {
       } else {
         // 用户第一次添加这个应用,还要去查这个应用的优惠政策
         const appinfo = await Application.queryByAppId(checkout_device_res.data.appId)
-        user = await User.addApp(openid, checkout_device_res.appId, appinfo.strategy.giftCoins)
+        user = await User.addApp(openid, checkout_device_res.data.appId, appinfo.strategy.giftCoins)
       }
       // 最后关联用户和设备
       const bind_result = await Device.link(openid, deviceid);
@@ -43,6 +44,7 @@ async function bind(req, res, next) {
 
 /**
  * 用户微信端使用普通兑换码充值
+ * tested
  * @param {*} req 
  * @param {*} res 
  * @param {*} next 
@@ -56,13 +58,13 @@ async function useNormalRedeemCode(req, res, next) {
       let validCode = check_res.data;
       // 给用户充值并且把这条兑换码消费掉
       let [user_res, code_res] = await Promise.all([
-        User.addCoin({ openid: req.body.openid, appid: validCode.appId, coinNum: validCode.denomination, developerid: validCode.developerId }),
+        User.addCoin({ openid: req.body.openid, appid: validCode.belongTo, coinNum: validCode.denomination, developerid: validCode.createBy }),
         NormalRedeemCode.consume(req.body.openid, req.body.redeemcode)
       ]);
       if (user_res && code_res) {
-        res.json({ status: 'ok', data: user, msg: '充值成功' });
+        res.json({ status: 'ok', data: user_res, msg: '充值成功' });
       } else {
-        res.json({ status: 'fail', data: user, msg: '充值失败' });
+        res.json({ status: 'fail', data: user_res, msg: '充值失败', data2: code_res });
       }
     } else {
       // 兑换码无效
@@ -94,6 +96,7 @@ async function getUserInfo(req, res, next) {
 
 /**
  * 用户查询自己某个应用下绑定了哪些设备
+ * tested
  * @param {*} req 
  * @param {*} res 
  * @param {*} next 
@@ -110,14 +113,24 @@ async function getDevicesListByAppIdAndUserId(req, res, next) {
 
 /**
  * 用户解绑设备
+ * tested
  * @param {*} req 
  * @param {*} res 
  * @param {*} next 
  */
 async function unbundlingDevice(req, res, next) {
   try {
-    let remove = await Device.unbundling(req.body);
-    res.json({ status: 'ok', data: remove, msg: '解绑成功' });
+    let [device_remove, user_reduce] = await Promise.all([
+      Device.unbundling(req.body),
+      User.unbundling(req.body)
+    ]);
+    // 删除设备的同时要将用户该应用下的设备数减1
+    if (device_remove && user_reduce) {
+      res.json({ status: 'ok', data: user_reduce, msg: '解绑成功' });
+    } else {
+      res.json({ status: 'fail', data: null, msg: '解绑失败' });
+    }
+
   } catch (e) {
     console.log(e, "记录异常");
     res.json({ status: 'fail', data: null, msg: '服务端异常' });

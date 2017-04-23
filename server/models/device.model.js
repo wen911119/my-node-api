@@ -107,7 +107,7 @@ DevicesSchema.statics = {
     //   fkey: randomStr(20)
     // }
     // try{
-      
+
     // var result = await this.create(new_device);
     // }catch(e){
     //   console.log(e, 77777777);
@@ -161,9 +161,15 @@ DevicesSchema.statics = {
     let device = await this.findOne({ deviceId: deviceid }).exec();
     if (device && device.openId) {
       if (device.fkey + device.deviceId == skey) {
+        let lastLoginTime = device.lastLoginTime || new Date('1970-01-01');
+        let now = new Date();
+        let needPay = true;
+        if(lastLoginTime.toDateString() == now.toDateString()){
+          needPay = false;
+        }
         // 设备合法，还要更新skey
-        let _device = await this.findOneAndUpdate({ deviceId: deviceid }, { fkey: randomStr(20) }, { new: true }).exec();
-        return { status: 'ok', data: _device, msg: '设备合法' }
+        let _device = await this.findOneAndUpdate({ deviceId: deviceid }, { fkey: randomStr(20), lastLoginTime: Date.now() }, { new: true }).exec();
+        return { status: 'ok', data: _device, msg: '设备合法', needPay: needPay }
       }
       return { status: 'fail', data: null, msg: '非法登录' }
     }
@@ -171,7 +177,7 @@ DevicesSchema.statics = {
   },
 
   queryByAppIdAndOpenId(appid, openid) {
-    return this.find().exec({ appId: appid, openId: openid });
+    return this.find({ appId: appid, openId: openid }).exec();
   },
 
   unbundling({ deviceid, openid, appid }) {

@@ -61,7 +61,7 @@ UserSchema.statics = {
     if (user) {
       return user
     }
-    return this.create({ openId: openid, apps:[] });
+    return this.create({ openId: openid, apps: [] });
   },
 
 
@@ -70,14 +70,18 @@ UserSchema.statics = {
     return this.findOneAndUpdate({ openId: openid }, { $addToSet: { apps: { appId: appid, coins: giftCoins, devicesNum: 1 } } }, { new: true }).exec();
   },
   // 给用户一个已经存在的应用增加一个设备
-  addDeviceToApp(opened, appid) {
+  addDeviceToApp(openid, appid) {
     return this.findOneAndUpdate({ openId: openid, apps: { $elemMatch: { appId: appid } } }, { $inc: { "apps.$.devicesNum": 1 } }, { new: true }).exec();
   },
   // 设备登录时对所属用户的检查
-  async loginCheck(openId, fkey, appId) {
+  async loginCheck(openId, fkey, appId, needPay) {
     let user = await this.findOne({ openId: openId, apps: { $elemMatch: { appId: appId } } }, { "apps.$": 1 }).exec()
     if (user) {
-      if (user.apps[0].coins > 0) {
+      if (needPay && user.apps[0].coins >= 10) {
+        // 首次登录要先去扣点
+        let temp = await this.findOneAndUpdate({ openId: openId, apps: { $elemMatch: { appId: appId } } }, { $inc: { "apps.$.coins": -10 } }, { new: true }).exec();
+        return { status: 'ok', data: fkey, msg: '登录成功' }
+      } else if (!needPay) {
         return { status: 'ok', data: fkey, msg: '登录成功' }
       } else {
         return { status: 'fail', data: fkey, msg: '余额不足，请充值！' }
@@ -92,7 +96,7 @@ UserSchema.statics = {
     let user = await this.findOne({ openId: openid }).exec();
     if (user && user.apps.some(item => item.appId == appid)) {
       // 用户存在并且应用存在
-      return this.findOneAndUpdate({ openId: openid, apps: { $elemMatch: { appId: appid } } }, { $inc: { "appa.$.coins": coinNum } }, { new: true }).exec();
+      return this.findOneAndUpdate({ openId: openid, apps: { $elemMatch: { appId: appid } } }, { $inc: { "apps.$.coins": coinNum } }, { new: true }).exec();
     } else if (user) {
       // 用户存在但是应用不存在
       return this.findOneAndUpdate({ openId: openid }, { $addToSet: { apps: { appId: appid, coins: coinNum, devicesNum: 0, developerId: developerid } } }, { new: true }).exec();
@@ -109,10 +113,14 @@ UserSchema.statics = {
     return this.find({ apps: { $elemMatch: { appId: appid, developerId: developerid } } }, { "apps.$": 1 }).exec();
   },
 
-  queryByOpenIdAndAppId(openid, appid, developerid) {
+  queryByOpenIdAndAppId(openid, appid) {
     return this.find({ openId: openid, apps: { $elemMatch: { appId: appid } } }, { "apps.$": 1 }).exec();
-  }
+  },
 
+  unbundling({ openid, appid }) {
+    return this.findOneAndUpdate({ openId: openid, apps: { $elemMatch: { appId: appid } } }, { $inc: { "apps.$.devicesNum": -1 } }, { new: true }).exec();
+
+  }
 
 
 };
