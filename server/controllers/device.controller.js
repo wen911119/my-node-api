@@ -20,7 +20,7 @@ async function register(req, res, next) {
         let device_index = await CommonIndex.getNewIndex('device');
         let deviceid = 'E' + device_index.index;
         // 用这个设备号去换取微信临时带参二维码
-        let weixin_qrcode = await fetch('http://127.0.0.1:8080/wxapi/gettempqrcode?code=' + device_index.index)
+        let weixin_qrcode = await fetch('http://127.0.0.1:80/wxapi/gettempqrcode?code=' + device_index.index)
         let qrcode_url = await weixin_qrcode.text();
         if (qrcode_url) {
             let deviceinfo = {};
